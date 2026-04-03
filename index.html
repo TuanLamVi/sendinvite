@@ -155,14 +155,14 @@ button:active{
     <canvas id="canvas"></canvas>
 
     <div class="popup" id="popup">
-        <input type="text" id="text" placeholder="Nhập lời chúc...">
+        <input type="text" id="text" placeholder="Ghi tên khách mời...">
 
         <div class="row">
             <select id="font">
-                <option value="'Be Vietnam Pro'">Be Vietnam</option>
-                <option value="'Dancing Script'">Dancing Script</option>
-                <option value="'Caveat'">Caveat</option>
-                <option value="Arial">Arial</option>
+                <option value="'Be Vietnam Pro'">font Be Vietnam</option>
+                <option value="'Dancing Script'">font Dancing Script</option>
+                <option value="'Caveat'">font Caveat</option>
+                <option value="Arial">font Arial</option>
             </select>
 
             <input type="number" id="size" value="100">
@@ -171,8 +171,8 @@ button:active{
         <div class="palette" id="palette"></div>
 
         <div class="action-group">
-            <button class="btn-download" onclick="save()">Tải</button>
-            <button class="btn-share" onclick="share()">Share</button>
+            <button class="btn-download" onclick="save()">Tải về</button>
+            <button class="btn-share" onclick="share()">Chia sẻ</button>
         </div>
     </div>
 </div>
@@ -217,7 +217,7 @@ textInput.addEventListener("blur",()=>popup.classList.remove("active"));
 const CONFIG={
     imageUrl:"https://raw.githubusercontent.com/TuanLamVi/thiepmoiduc/main/thiepcuoi.png",
     x:0.5,
-    y:0.13
+    y:0.133
 };
 
 let img=new Image();

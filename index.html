@@ -1,4 +1,4 @@
-<meta property="og:title" content="THIỆP MỜI ONLINE.">
+<meta property="og:title" content="THIỆP MỜI ONLINE">
 <meta property="og:description" content="Gửi thiệp online giúp bạn tạo thiệp nhanh chóng, đẹp mắt chỉ trong vài giây. Tùy chỉnh font chữ, màu sắc và tải về hoặc chia sẻ trực tiếp ngay trên điện thoại">
 <meta property="og:image" content="https://link-anh-cua-ban.png">
 <meta property="og:url" content="https://tuanlamvi.github.io/sendinvite/">
@@ -159,10 +159,10 @@ button:active{
 
         <div class="row">
             <select id="font">
-                <option value="'Be Vietnam Pro'">font Be Vietnam</option>
-                <option value="'Dancing Script'">font Dancing Script</option>
-                <option value="'Caveat'">font Caveat</option>
-                <option value="Arial">font Arial</option>
+                <option value="'Be Vietnam Pro'">Kiểu chữ Be Vietnam</option>
+                <option value="'Dancing Script'">Kiểu chữ Dancing Script</option>
+                <option value="'Caveat'">Kiểu chữ Caveat</option>
+                <option value="Arial">Kiểu chữ Arial</option>
             </select>
 
             <input type="number" id="size" value="100">
@@ -217,13 +217,13 @@ textInput.addEventListener("blur",()=>popup.classList.remove("active"));
 const CONFIG={
     imageUrl:"https://raw.githubusercontent.com/TuanLamVi/thiepmoiduc/main/thiep%20moi.png",
     x:0.5,
-    y:0.151
+    y:0.15
 };
 
 let img=new Image();
 let color="#000";
 
-const colors=["#000","#e91e63","#ff1744","#b8860b","#fff","#333"];
+const colors=["#0D47A1","#e91e63","#ff1744","#b8860b","#fff","#333"];
 const palette=document.getElementById("palette");
 
 colors.forEach(c=>{

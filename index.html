@@ -77,11 +77,14 @@
             transition: all 0.3s ease;
         }
         .external-input:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(217, 140, 179, 0.25); }
+        
+        /* OVERLAY VÀ POPUP BÂY GIỜ ĐỘC LẬP HOÀN TOÀN */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: transparent; display: none; z-index: 9998;
         }
         .overlay.active { display: block; }
+        
         .popup {
             position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
             width: 92%; max-width: 400px;
@@ -102,11 +105,11 @@
         .close-btn:hover { background: #ffe4ef; transform: rotate(90deg); }
         .section { margin-bottom: 15px; width: 100%; }
         .section-label { display: block; font-size: 11px; font-weight: 700; color: #8c7a82; margin-bottom: 6px; text-transform: uppercase; }
-        input, select {
+        input[type="text"], select {
             width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid #ebd4df;
             background: #fffcfd; font-size: 14px; outline: none; color: var(--text-dark); transition: 0.3s;
         }
-        input:focus, select:focus { border-color: var(--wedding-pink); box-shadow: 0 0 0 3px rgba(217, 140, 179, 0.1); }
+        input[type="text"]:focus, select:focus { border-color: var(--wedding-pink); box-shadow: 0 0 0 3px rgba(217, 140, 179, 0.1); }
         .size-slider { background: #fffcfd; padding: 10px 15px; border-radius: 15px; border: 1px solid #ebd4df; display: flex; align-items: center; gap: 12px; }
         .size-slider input { flex: 1; accent-color: var(--wedding-pink); padding: 0; border: none; }
         #size-value { font-weight: 700; color: var(--wedding-pink); min-width: 30px; text-align: right; }
@@ -130,10 +133,7 @@
 </head>
 <body>
 
-    <div class="overlay" id="overlay" onclick="hidePopup()"></div>
-
     <div class="container">
-        
         <div class="header-title">Thiệp Mời Của Chúng Mình</div>
 
         <div class="canvas-wrapper">
@@ -143,47 +143,6 @@
         <input type="text" readonly class="external-input" 
                placeholder="✨ Chạm để viết tên khách mời ✨" 
                onclick="showPopup()">
-
-        <div class="popup" id="popup">
-            <div class="popup-header">
-                <div class="popup-title">
-                    <span style="font-size: 22px;">✍️</span> Viết Lời Mời
-                </div>
-                <button class="close-btn" onclick="hidePopup()">×</button>
-            </div>
-            
-            <div class="section">
-                <label class="section-label">Tên khách mời</label>
-                <input type="text" id="text" placeholder="Ví dụ: Gia đình Bác Tám Tuyến">
-            </div>
-            
-            <div class="section">
-                <label class="section-label">Kiểu chữ nghệ thuật</label>
-                <select id="font">
-                    <option value="'Great Vibes'">Great Vibes (Cổ điển)</option>
-                    <option value="'Dancing Script'">Dancing Script (Lãng mạn)</option>
-                    <option value="'Caveat'">Caveat (Tự nhiên)</option>
-                    <option value="'Be Vietnam Pro'">Be Vietnam Pro (Hiện đại)</option>
-                </select>
-            </div>
-            
-            <div class="section">
-                <label class="section-label">Kích cỡ chữ: <span id="size-value">120</span></label>
-                <div class="size-slider">
-                    <input type="range" id="size" min="40" max="250" value="120">
-                </div>
-            </div>
-            
-            <div class="section">
-                <label class="section-label">Màu sắc</label>
-                <div class="palette" id="palette"></div>
-            </div>
-            
-            <div class="action-group">
-                <button class="btn btn-download" onclick="save()">📥 LƯU ẢNH</button>
-                <button class="btn btn-share" onclick="share()">📤 GỬI THIỆP</button>
-            </div>
-        </div>
 
         <div class="contact-footer">
             <div class="contact-title">Hỗ Trợ Thiết Kế Thiệp</div>
@@ -199,6 +158,48 @@
                     <span class="contact-number">0984 062 140</span>
                 </a>
             </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="hidePopup()"></div>
+    <div class="popup" id="popup">
+        <div class="popup-header">
+            <div class="popup-title">
+                <span style="font-size: 22px;">✍️</span> Viết Lời Mời
+            </div>
+            <button class="close-btn" onclick="hidePopup()">×</button>
+        </div>
+        
+        <div class="section">
+            <label class="section-label">Tên khách mời</label>
+            <input type="text" id="text" placeholder="Ví dụ: Gia đình Bác Tám Tuyến">
+        </div>
+        
+        <div class="section">
+            <label class="section-label">Kiểu chữ nghệ thuật</label>
+            <select id="font">
+                <option value="'Great Vibes'">Great Vibes (Cổ điển)</option>
+                <option value="'Dancing Script'">Dancing Script (Lãng mạn)</option>
+                <option value="'Caveat'">Caveat (Tự nhiên)</option>
+                <option value="'Be Vietnam Pro'">Be Vietnam Pro (Hiện đại)</option>
+            </select>
+        </div>
+        
+        <div class="section">
+            <label class="section-label">Kích cỡ chữ: <span id="size-value">120</span></label>
+            <div class="size-slider">
+                <input type="range" id="size" min="40" max="250" value="120">
+            </div>
+        </div>
+        
+        <div class="section">
+            <label class="section-label">Màu sắc</label>
+            <div class="palette" id="palette"></div>
+        </div>
+        
+        <div class="action-group">
+            <button class="btn btn-download" onclick="save()">📥 LƯU ẢNH</button>
+            <button class="btn btn-share" onclick="share()">📤 GỬI THIỆP</button>
         </div>
     </div>
 
@@ -277,32 +278,19 @@
         /* TẠO TÊN FILE TỰ ĐỘNG CHUẨN SEO/FILE SYSTEM */
         function generateFileName() {
             let text = textInput.value.trim();
-            
-            // Nếu chưa nhập tên gì thì lấy tên mặc định
             if (!text) return "thiep_cuoi_online.png";
             
-            // 1. Đổi sang chữ thường
             text = text.toLowerCase();
-            
-            // 2. Xóa các dấu tiếng Việt (á, à, ả, ã, ạ, â, ă...)
             text = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            
-            // 3. Xử lý riêng chữ đ
             text = text.replace(/đ/g, "d");
-            
-            // 4. Biến tất cả các ký tự không phải chữ/số thành dấu gạch dưới "_"
             text = text.replace(/[^a-z0-9]/g, "_");
-            
-            // 5. Xóa các dấu gạch dưới liền nhau (ví dụ: "__" thành "_")
             text = text.replace(/_+/g, "_");
-            
-            // 6. Cắt bỏ dấu gạch dưới thừa ở đầu và cuối
             text = text.replace(/^_|_$/g, "");
             
             return text + ".png";
         }
 
-        /* LƯU ẢNH (Đã áp dụng tạo tên file tự động) */
+        /* LƯU VÀ GỬI ẢNH */
         function save() {
             const fileName = generateFileName();
             const a = document.createElement("a");
@@ -311,7 +299,6 @@
             a.click();
         }
 
-        /* GỬI ẢNH (Đã áp dụng tạo tên file tự động) */
         async function share() {
             if (!navigator.share) return alert("Trình duyệt không hỗ trợ chia sẻ trực tiếp. Vui lòng bấm LƯU ẢNH.");
             try {

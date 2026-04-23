@@ -1,286 +1,326 @@
-<meta property="og:title" content="THIỆP MỜI ONLINE">
-<meta property="og:description" content="Gửi thiệp online giúp bạn tạo thiệp nhanh chóng, đẹp mắt chỉ trong vài giây. Tùy chỉnh font chữ, màu sắc và tải về hoặc chia sẻ trực tiếp ngay trên điện thoại">
-<meta property="og:image" content="https://raw.githubusercontent.com/TuanLamVi/sendinvite/main/logo.jpg">
-<meta property="og:url" content="https://tuanlamvi.github.io/sendinvite/">
-<meta property="og:type" content="website">
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GỬI THIỆP ONLINE</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&family=Dancing+Script&family=Caveat&display=swap" rel="stylesheet">
-
-<style>
-:root {
-    --pink1:#ff9a9e;
-    --pink2:#fad0c4;
-    --pink3:#fbc2eb;
-}
-
-body {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    margin:0;
-    background:linear-gradient(135deg,var(--pink1),var(--pink3));
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-}
-
-.container{
-    width:100%;
-    max-width:420px;
-    background:white;
-    border-radius:22px;
-    padding:15px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.2);
-}
-
-.canvas-wrapper{
-    position:relative;
-}
-
-canvas{
-    width:100%;
-    border-radius:14px;
-}
-
-/* ===== POPUP ===== */
-.popup{
-    position:absolute;
-    bottom:10px;
-    left:10px;
-    right:10px;
-    background:rgba(255,255,255,0.95);
-    backdrop-filter:blur(10px);
-    border-radius:18px;
-    padding:12px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.25);
-    display:none;
-    transition:0.3s;
-}
-
-/* Khi mở bàn phím */
-.popup.active{
-    bottom:80px;
-}
-
-/* ===== INPUT ===== */
-input,select{
-    width:100%;
-    padding:12px;
-    margin-top:6px;
-    border-radius:14px;
-    border:2px solid #f3c1cc;
-    font-size:15px;
-    transition:0.25s;
-    outline:none;
-}
-
-input:focus,select:focus{
-    border-color:#e91e63;
-    box-shadow:0 0 0 3px rgba(233,30,99,0.15);
-}
-
-/* ===== ROW ===== */
-.row{
-    display:flex;
-    gap:8px;
-}
-.row select{flex:2;}
-.row input{flex:1;text-align:center;}
-
-/* ===== COLOR ===== */
-.palette{
-    display:flex;
-    justify-content:space-around;
-    margin-top:10px;
-}
-.color-dot{
-    width:28px;
-    height:28px;
-    border-radius:50%;
-    cursor:pointer;
-    border:2px solid white;
-    box-shadow:0 3px 6px rgba(0,0,0,0.2);
-    transition:0.2s;
-}
-.color-dot:hover{
-    transform:scale(1.2);
-}
-
-/* ===== BUTTON ===== */
-button{
-    width:100%;
-    margin-top:8px;
-    padding:12px;
-    border-radius:14px;
-    border:none;
-    font-weight:600;
-    cursor:pointer;
-    transition:0.2s;
-}
-
-button:active{
-    transform:scale(0.95);
-}
-
-.btn-download{
-    background:linear-gradient(135deg,#ff758c,#ff7eb3);
-    color:white;
-    box-shadow:0 5px 15px rgba(255,118,140,0.4);
-}
-
-.btn-share{
-    background:linear-gradient(135deg,#36d1dc,#5b86e5);
-    color:white;
-    box-shadow:0 5px 15px rgba(54,209,220,0.4);
-}
-
-.action-group{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THIỆP CƯỚI ONLINE</title>
+    
+    <link rel="icon" href="https://raw.githubusercontent.com/TuanLamVi/invite/main/favicon.png" type="image/png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script&family=Caveat&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+   
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --wedding-pink: #d98cb3;
+            --wedding-gold: #d4af37;
+            --wedding-light: #fff5f8;
+            --text-dark: #5a4a52;
+        }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            margin: 0;
+            background: linear-gradient(-45deg, #ffecd2, #fcb69f, #fbc2eb, #a6c1ee);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 28px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15), inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        .header-title {
+            text-align: center;
+            font-family: 'Great Vibes', cursive;
+            font-size: 32px;
+            color: var(--wedding-pink);
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+        .canvas-wrapper { position: relative; width: 100%; }
+        canvas {
+            width: 100%;
+            display: block;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(217, 140, 179, 0.2);
+            border: 3px solid white;
+        }
+        .external-input {
+            width: 100%;
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(217, 140, 179, 0.4);
+            background: linear-gradient(135deg, #ffffff, var(--wedding-light));
+            text-align: center;
+            font-size: 15px;
+            color: var(--wedding-pink);
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(217, 140, 179, 0.15);
+            transition: all 0.3s ease;
+        }
+        .external-input:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(217, 140, 179, 0.25); }
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent; display: none; z-index: 9998;
+        }
+        .overlay.active { display: block; }
+        .popup {
+            position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
+            width: 92%; max-width: 400px;
+            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
+            border-radius: 30px; padding: 25px 20px;
+            box-shadow: 0 -10px 40px rgba(217, 140, 179, 0.2); z-index: 9999;
+            transition: bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .popup.active { bottom: 25px; }
+        .popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .popup-title { font-size: 18px; font-weight: 700; color: var(--wedding-pink); display: flex; align-items: center; gap: 8px; }
+        .close-btn {
+            width: 34px; height: 34px; border: none; background: var(--wedding-light);
+            color: var(--wedding-pink); border-radius: 50%; font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        .close-btn:hover { background: #ffe4ef; transform: rotate(90deg); }
+        .section { margin-bottom: 15px; width: 100%; }
+        .section-label { display: block; font-size: 11px; font-weight: 700; color: #8c7a82; margin-bottom: 6px; text-transform: uppercase; }
+        input, select {
+            width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid #ebd4df;
+            background: #fffcfd; font-size: 14px; outline: none; color: var(--text-dark); transition: 0.3s;
+        }
+        input:focus, select:focus { border-color: var(--wedding-pink); box-shadow: 0 0 0 3px rgba(217, 140, 179, 0.1); }
+        .size-slider { background: #fffcfd; padding: 10px 15px; border-radius: 15px; border: 1px solid #ebd4df; display: flex; align-items: center; gap: 12px; }
+        .size-slider input { flex: 1; accent-color: var(--wedding-pink); padding: 0; border: none; }
+        #size-value { font-weight: 700; color: var(--wedding-pink); min-width: 30px; text-align: right; }
+        .palette { display: flex; justify-content: space-between; gap: 5px; padding: 5px 0; }
+        .color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.15); transition: 0.2s; }
+        .color-dot:active { transform: scale(0.8); }
+        .action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
+        .btn { padding: 14px; border-radius: 20px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); transition: 0.3s; }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-download { background: linear-gradient(135deg, #e6c27a, #d4af37); color: #fff; }
+        .btn-share { background: linear-gradient(135deg, #f3a183, #ec6f66); }
+        .contact-footer { margin-top: 25px; padding: 20px; background: linear-gradient(to bottom, #ffffff, var(--wedding-light)); border-radius: 24px; text-align: center; box-shadow: 0 4px 15px rgba(217, 140, 179, 0.08); border: 1px solid rgba(217, 140, 179, 0.2); }
+        .contact-title { font-weight: 600; color: var(--wedding-pink); font-size: 13px; text-transform: uppercase; margin-bottom: 15px; }
+        .contact-row { display: flex; gap: 12px; }
+        .contact-btn { flex: 1; background: white; border-radius: 18px; padding: 12px 5px; text-decoration: none; color: var(--text-dark); border: 1px solid #ebd4df; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .contact-btn:hover { border-color: var(--wedding-pink); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(217, 140, 179, 0.15); }
+        .contact-icon { font-size: 24px; line-height: 1; margin-bottom: 2px; }
+        .contact-label { font-size: 11px; color: #8c7a82; }
+        .contact-number { font-size: 14px; font-weight: 700; color: var(--wedding-pink); }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <div class="overlay" id="overlay" onclick="hidePopup()"></div>
 
-<div class="canvas-wrapper" id="wrapper">
-    <canvas id="canvas"></canvas>
+    <div class="container">
+        
+        <div class="header-title">Thiệp Mời Của Chúng Mình</div>
 
-    <div class="popup" id="popup">
-        <input type="text" id="text" placeholder="Ghi tên khách mời...">
+        <div class="canvas-wrapper">
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <input type="text" readonly class="external-input" 
+               placeholder="✨ Chạm để viết tên khách mời ✨" 
+               onclick="showPopup()">
 
-        <div class="row">
-           <select id="font">
-    <option value="'Dancing Script'">Kiểu chữ Dancing Script</option>
-    <option value="'Be Vietnam Pro'">Kiểu chữ Be Vietnam</option>
-    <option value="'Caveat'">Kiểu chữ Caveat</option>
-    <option value="Arial">Kiểu chữ Arial</option>
-</select>
-
-            <input type="number" id="size" value="100">
+        <div class="popup" id="popup">
+            <div class="popup-header">
+                <div class="popup-title">
+                    <span style="font-size: 22px;">✍️</span> Viết Lời Mời
+                </div>
+                <button class="close-btn" onclick="hidePopup()">×</button>
+            </div>
+            
+            <div class="section">
+                <label class="section-label">Tên khách mời</label>
+                <input type="text" id="text" placeholder="Ví dụ: Gia đình Bác Tám Tuyến">
+            </div>
+            
+            <div class="section">
+                <label class="section-label">Kiểu chữ nghệ thuật</label>
+                <select id="font">
+                    <option value="'Great Vibes'">Great Vibes (Cổ điển)</option>
+                    <option value="'Dancing Script'">Dancing Script (Lãng mạn)</option>
+                    <option value="'Caveat'">Caveat (Tự nhiên)</option>
+                    <option value="'Be Vietnam Pro'">Be Vietnam Pro (Hiện đại)</option>
+                </select>
+            </div>
+            
+            <div class="section">
+                <label class="section-label">Kích cỡ chữ: <span id="size-value">120</span></label>
+                <div class="size-slider">
+                    <input type="range" id="size" min="40" max="250" value="120">
+                </div>
+            </div>
+            
+            <div class="section">
+                <label class="section-label">Màu sắc</label>
+                <div class="palette" id="palette"></div>
+            </div>
+            
+            <div class="action-group">
+                <button class="btn btn-download" onclick="save()">📥 LƯU ẢNH</button>
+                <button class="btn btn-share" onclick="share()">📤 GỬI THIỆP</button>
+            </div>
         </div>
 
-        <div class="palette" id="palette"></div>
-
-        <div class="action-group">
-            <button class="btn-download" onclick="save()">Tải về</button>
-            <button class="btn-share" onclick="share()">Chia sẻ</button>
+        <div class="contact-footer">
+            <div class="contact-title">Hỗ Trợ Thiết Kế Thiệp</div>
+            <div class="contact-row">
+                <a href="tel:0984062140" class="contact-btn">
+                    <span class="contact-icon">📞</span>
+                    <span class="contact-label">Gọi điện ngay</span>
+                    <span class="contact-number">0984 062 140</span>
+                </a>
+                <a href="https://zalo.me/0984062140" target="_blank" class="contact-btn">
+                    <span class="contact-icon">💬</span>
+                    <span class="contact-label">Nhắn tin Zalo</span>
+                    <span class="contact-number">0984 062 140</span>
+                </a>
+            </div>
         </div>
     </div>
-</div>
 
-<input type="text" placeholder="Bấm để nhập..." onclick="showPopup()">
+    <script>
+        const CONFIG = {
+            imageUrl: "https://raw.githubusercontent.com/TuanLamVi/sinhnhat/main/thiepmau7.png",
+            textX: 0.5,           
+            textY: 0.152,         
+            textAlign: "center",  
+            shadowColor: "rgba(0,0,0,0.3)",
+            shadowBlur: 8
+        };
 
-</div>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        const popup = document.getElementById("popup");
+        const overlay = document.getElementById("overlay");
+        const textInput = document.getElementById("text");
+        const sizeSlider = document.getElementById("size");
+        const sizeValue = document.getElementById("size-value");
+        const fontSelect = document.getElementById("font");
+        
+        let color = "#5a4a52"; 
 
-<script>
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
+        let img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = CONFIG.imageUrl;
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            draw();
+        };
 
-const popup=document.getElementById("popup");
-const wrapper=document.getElementById("wrapper");
+        const colors = ["#5a4a52", "#d98cb3", "#d4af37", "#c0392b", "#2c3e50", "#ffffff"];
+        const palette = document.getElementById("palette");
+        colors.forEach(c => {
+            let d = document.createElement("div");
+            d.className = "color-dot";
+            d.style.background = c;
+            d.onclick = () => { color = c; draw(); };
+            palette.appendChild(d);
+        });
 
-const textInput=document.getElementById("text");
-const sizeInput=document.getElementById("size");
-const fontSelect=document.getElementById("font");
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            const text = textInput.value.trim();
+            if (text) {
+                const fontSize = parseFloat(sizeSlider.value);
+                ctx.fillStyle = color;
+                ctx.font = `${fontSize}px ${fontSelect.value}`;
+                ctx.textAlign = CONFIG.textAlign;
+                ctx.textBaseline = "bottom";
+                ctx.shadowColor = CONFIG.shadowColor;
+                ctx.shadowBlur = CONFIG.shadowBlur;
+                ctx.fillText(text, canvas.width * CONFIG.textX, canvas.height * CONFIG.textY);
+                ctx.shadowBlur = 0;
+            }
+        }
 
-function showPopup(){
-    popup.style.display="block";
-    popup.classList.add("active");
-    textInput.focus();
-}
+        sizeSlider.oninput = () => { sizeValue.textContent = sizeSlider.value; draw(); };
+        textInput.oninput = draw;
+        fontSelect.onchange = draw;
 
-function hidePopup(){
-    popup.style.display="none";
-    popup.classList.remove("active");
-}
+        function showPopup() {
+            popup.classList.add("active");
+            overlay.classList.add("active");
+            textInput.focus();
+        }
 
-wrapper.addEventListener("click",(e)=>{
-    if(e.target===wrapper){
-        hidePopup();
-    }
-});
+        function hidePopup() {
+            popup.classList.remove("active");
+            overlay.classList.remove("active");
+        }
 
-popup.addEventListener("click",(e)=>e.stopPropagation());
+        /* TẠO TÊN FILE TỰ ĐỘNG CHUẨN SEO/FILE SYSTEM */
+        function generateFileName() {
+            let text = textInput.value.trim();
+            
+            // Nếu chưa nhập tên gì thì lấy tên mặc định
+            if (!text) return "thiep_cuoi_online.png";
+            
+            // 1. Đổi sang chữ thường
+            text = text.toLowerCase();
+            
+            // 2. Xóa các dấu tiếng Việt (á, à, ả, ã, ạ, â, ă...)
+            text = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            // 3. Xử lý riêng chữ đ
+            text = text.replace(/đ/g, "d");
+            
+            // 4. Biến tất cả các ký tự không phải chữ/số thành dấu gạch dưới "_"
+            text = text.replace(/[^a-z0-9]/g, "_");
+            
+            // 5. Xóa các dấu gạch dưới liền nhau (ví dụ: "__" thành "_")
+            text = text.replace(/_+/g, "_");
+            
+            // 6. Cắt bỏ dấu gạch dưới thừa ở đầu và cuối
+            text = text.replace(/^_|_$/g, "");
+            
+            return text + ".png";
+        }
 
-textInput.addEventListener("focus",()=>popup.classList.add("active"));
-textInput.addEventListener("blur",()=>popup.classList.remove("active"));
+        /* LƯU ẢNH (Đã áp dụng tạo tên file tự động) */
+        function save() {
+            const fileName = generateFileName();
+            const a = document.createElement("a");
+            a.href = canvas.toDataURL("image/png");
+            a.download = fileName; 
+            a.click();
+        }
 
-const CONFIG={
-    imageUrl:"https://raw.githubusercontent.com/TuanLamVi/thiepmoiduc/main/thiepcuoi.png",
-    x:0.5,
-    y:0.15
-};
-
-let img=new Image();
-let color="#000";
-
-const colors=["#0D47A1","#e91e63","#ff1744","#b8860b","#fff","#333"];
-const palette=document.getElementById("palette");
-
-colors.forEach(c=>{
-    let d=document.createElement("div");
-    d.className="color-dot";
-    d.style.background=c;
-    d.onclick=()=>{color=c;draw();};
-    palette.appendChild(d);
-});
-
-img.crossOrigin="anonymous";
-img.src=CONFIG.imageUrl;
-
-img.onload=()=>{
-    canvas.width=img.width;
-    canvas.height=img.height;
-    draw();
-};
-
-async function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.drawImage(img,0,0);
-
-    let text=textInput.value;
-    let size=sizeInput.value;
-    let font=fontSelect.value;
-
-    try{await document.fonts.load(`${size}px ${font}`);}catch(e){}
-
-    if(text){
-        ctx.fillStyle=color;
-        ctx.font=`${size}px ${font}`;
-        ctx.textAlign="center";
-        ctx.fillText(text,canvas.width*CONFIG.x,canvas.height*CONFIG.y);
-    }
-}
-
-textInput.addEventListener("input",draw);
-sizeInput.addEventListener("input",draw);
-fontSelect.addEventListener("change",draw);
-
-function save(){
-    let a=document.createElement("a");
-    a.href=canvas.toDataURL();
-    a.download="thiep.png";
-    a.click();
-}
-
-async function share(){
-    if(!navigator.share) return alert("Không hỗ trợ");
-
-    let blob=await (await fetch(canvas.toDataURL())).blob();
-    let file=new File([blob],"thiep.png",{type:"image/png"});
-
-    navigator.share({files:[file]});
-}
-</script>
-
+        /* GỬI ẢNH (Đã áp dụng tạo tên file tự động) */
+        async function share() {
+            if (!navigator.share) return alert("Trình duyệt không hỗ trợ chia sẻ trực tiếp. Vui lòng bấm LƯU ẢNH.");
+            try {
+                const fileName = generateFileName();
+                const blob = await (await fetch(canvas.toDataURL("image/png"))).blob();
+                const file = new File([blob], fileName, { type: "image/png" });
+                await navigator.share({ files: [file], title: "Thiệp Mời", text: "Trân trọng kính mời!" });
+            } catch (e) {}
+        }
+    </script>
 </body>
 </html>

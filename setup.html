@@ -56,12 +56,11 @@
                 <input type="text" id="noteInput" placeholder="Nhập ghi chú để dễ nhớ...">
             </div>
 
-            <!-- KHU VỰC TẢI ẢNH MIỄN PHÍ MỚI -->
             <div class="form-group" style="border: 2px dashed #4CAF50; background: #e8f5e9;">
                 <div style="text-align: center; margin-bottom: 15px;">
                     <p style="margin-top: 0; color: #2e7d32; font-weight: bold; font-size: 15px;">BƯỚC 1: TẢI ẢNH TỪ ĐIỆN THOẠI LÊN MẠNG</p>
                     <a href="https://postimages.org/" target="_blank" style="display: inline-block; background: #2e7d32; color: white; padding: 12px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">MỞ TRANG TẢI ẢNH MIỄN PHÍ</a>
-                    <p style="font-size: 13px; color: #555; margin-bottom: 0; margin-top: 10px;">(Tại trang web mới, bấm "Choose images", sau khi tải xong hãy copy dòng <b>"Direct link"</b> hoặc <b>"Đường dẫn trực tiếp"</b>)</p>
+                    <p style="font-size: 13px; color: #555; margin-bottom: 0; margin-top: 10px;">(Tại trang web mới, tải ảnh lên rồi copy dòng <b>"Direct link"</b> hoặc <b>"Đường dẫn trực tiếp"</b>)</p>
                 </div>
             </div>
 
@@ -71,8 +70,17 @@
                 <button type="button" class="btn-success" onclick="loadImage()" style="margin-top: 10px; width: 100%;">Cập nhật ảnh để xem trước</button>
             </div>
 
+            <!-- PHẦN MỚI: CHỈNH CỠ CHỮ -->
             <div class="form-group">
-                <label>🎯 BƯỚC 3: Click trực tiếp vào ảnh bên dưới để chọn vị trí chữ:</label>
+                <label>🔠 BƯỚC 3: Cỡ chữ mặc định:</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <input type="range" id="previewSize" min="40" max="280" value="120" step="2" style="flex: 1; accent-color: #e91e63;" oninput="updatePreviewSize()">
+                    <span id="previewSizeValue" style="font-weight: bold; color: #e91e63; font-size: 16px; min-width: 30px; text-align: center;">120</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>🎯 BƯỚC 4: Click trực tiếp vào ảnh bên dưới để chọn vị trí chữ:</label>
                 <div class="note">Toạ độ X: <span id="valX" style="font-weight:bold;color:#e91e63">0.5</span> | Toạ độ Y: <span id="valY" style="font-weight:bold;color:#e91e63">0.152</span></div>
                 <canvas id="previewCanvas"></canvas>
             </div>
@@ -92,7 +100,9 @@
         const ctx = canvas.getContext('2d');
         let currentImg = new Image();
         currentImg.crossOrigin = "anonymous";
+        
         let tempPosition = { x: 0.5, y: 0.152 };
+        let tempFontSize = 120; // Biến lưu cỡ chữ
 
         function renderList() {
             const container = document.getElementById('listContainer');
@@ -107,7 +117,14 @@
             keys.sort((a, b) => b - a).forEach(id => {
                 const tpl = templates[id];
                 const baseUrl = window.location.href.split('setup.html')[0];
-                const params = new URLSearchParams({ img: tpl.imageUrl, x: tpl.textPosition.x, y: tpl.textPosition.y });
+                
+                // Thêm tham số size vào link
+                const params = new URLSearchParams({ 
+                    img: tpl.imageUrl, 
+                    x: tpl.textPosition.x, 
+                    y: tpl.textPosition.y,
+                    size: tpl.fontSize || 120
+                });
                 const finalLink = `${baseUrl}index.html?${params.toString()}`;
 
                 const div = document.createElement('div');
@@ -115,7 +132,7 @@
                 div.innerHTML = `
                     <div class="template-info">
                         <div class="template-note">${tpl.note || "Không có ghi chú"}</div>
-                        <div class="template-id">Ngày tạo: ${new Date(parseInt(id)).toLocaleString('vi-VN')}</div>
+                        <div class="template-id">Cỡ chữ: ${tpl.fontSize || 120}px | Ngày tạo: ${new Date(parseInt(id)).toLocaleString('vi-VN')}</div>
                     </div>
                     <div class="template-actions">
                         <button class="btn-info" onclick="copyLink('${finalLink}')">🔗 Copy Link Khách</button>
@@ -134,6 +151,12 @@
             document.getElementById('noteInput').value = '';
             document.getElementById('imgUrl').value = '';
             tempPosition = { x: 0.5, y: 0.152 };
+            
+            // Đặt lại cỡ chữ mặc định
+            tempFontSize = 120;
+            document.getElementById('previewSize').value = 120;
+            document.getElementById('previewSizeValue').innerText = 120;
+            
             updateCoordsDisplay();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -146,13 +169,27 @@
             document.getElementById('currentId').value = id;
             document.getElementById('noteInput').value = tpl.note;
             document.getElementById('imgUrl').value = tpl.imageUrl;
+            
             tempPosition = { x: tpl.textPosition.x, y: tpl.textPosition.y };
+            
+            // Nạp cỡ chữ cũ
+            tempFontSize = tpl.fontSize || 120;
+            document.getElementById('previewSize').value = tempFontSize;
+            document.getElementById('previewSizeValue').innerText = tempFontSize;
+
             updateCoordsDisplay();
             loadImage();
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
         function closeForm() { document.getElementById('editSection').style.display = 'none'; }
+
+        // Cập nhật cỡ chữ khi kéo thanh trượt
+        function updatePreviewSize() {
+            tempFontSize = parseInt(document.getElementById('previewSize').value);
+            document.getElementById('previewSizeValue').innerText = tempFontSize;
+            if(currentImg.src) drawPreview();
+        }
 
         function loadImage() {
             const url = document.getElementById('imgUrl').value.trim();
@@ -174,14 +211,19 @@
             ctx.drawImage(currentImg, 0, 0);
             const textX = canvas.width * tempPosition.x;
             const textY = canvas.height * tempPosition.y;
-            ctx.fillStyle = "#e91e63"; ctx.font = "80px 'Be Vietnam Pro', sans-serif";
-            ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+            
+            ctx.fillStyle = "#e91e63"; 
+            // Dùng cỡ chữ động thay vì cố định 80px
+            ctx.font = `${tempFontSize}px 'Be Vietnam Pro', sans-serif`;
+            ctx.textAlign = "center"; 
+            ctx.textBaseline = "bottom";
             ctx.fillText("Tên Mẫu", textX, textY);
+            
             ctx.fillStyle = "blue"; ctx.beginPath(); ctx.arc(textX, textY, 6, 0, Math.PI * 2); ctx.fill();
         }
 
         canvas.addEventListener('click', (e) => {
-            if(!currentImg.src) return; // Nếu chưa có ảnh thì không cho click
+            if(!currentImg.src) return; 
             const rect = canvas.getBoundingClientRect();
             tempPosition.x = parseFloat(((e.clientX - rect.left) * (canvas.width / rect.width) / canvas.width).toFixed(3));
             tempPosition.y = parseFloat(((e.clientY - rect.top) * (canvas.height / rect.height) / canvas.height).toFixed(3));
@@ -197,7 +239,8 @@
             const imageUrl = document.getElementById('imgUrl').value.trim();
             if(!imageUrl) return alert("Vui lòng tải ảnh lên hoặc dán link ảnh!");
 
-            templates[id] = { id, note, imageUrl, textPosition: { ...tempPosition } };
+            // Lưu thêm thuộc tính fontSize
+            templates[id] = { id, note, imageUrl, textPosition: { ...tempPosition }, fontSize: tempFontSize };
             localStorage.setItem(DB_KEY, JSON.stringify(templates));
             alert('Đã lưu thành công!');
             closeForm();

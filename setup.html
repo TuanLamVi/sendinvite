@@ -34,14 +34,12 @@
         canvas { width: 100%; border: 2px dashed #ccc; border-radius: 8px; cursor: crosshair; margin-top: 10px; }
         .note { font-size: 13px; color: #666; margin-top: 5px; }
         
-        /* Hiệu ứng tải dữ liệu */
         #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { border: 5px solid #f3f3f3; border-top: 5px solid #e91e63; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <!-- MÀN HÌNH CHỜ XỬ LÝ -->
     <div id="loadingOverlay">
         <div class="spinner"></div>
         <h3 style="color: #e91e63; margin: 0;">Đang kết nối Google Sheet...</h3>
@@ -104,10 +102,10 @@
     </div>
 
     <script>
-        // LIÊN KẾT API GOOGLE SHEET CỦA BẠN
-        const API_URL = "https://script.google.com/macros/s/AKfycbxWK9rCRVGoGSehVxMIxy_68_OwacwKiQyn8qgDcXgd_xB45jdwZJQAGM3zBwFLFFASjg/exec";
+        // LIÊN KẾT API GOOGLE SHEET
+        const API_URL = "https://script.google.com/macros/s/AKfycbzZ8d6YmBQwYF1hNaHUYWqZBQQ4p3z1Uuu3NrV4VJMKJXKp9It0kdLkYdSAED65aQTRQw/exec";
         
-        let templates = {}; // Dữ liệu sẽ được kéo từ Google Sheet
+        let templates = {}; 
         
         const canvas = document.getElementById('previewCanvas');
         const ctx = canvas.getContext('2d');
@@ -117,11 +115,8 @@
         let tempPosition = { x: 0.5, y: 0.152 };
         let tempFontSize = 80;
 
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
-        }
+        function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
 
-        // KÉO DỮ LIỆU TỪ GOOGLE SHEET KHI MỞ TRANG
         async function fetchTemplates() {
             showLoading(true);
             try {
@@ -130,17 +125,14 @@
                 templates = {};
                 data.forEach(item => {
                     templates[item.id] = {
-                        id: item.id,
-                        note: item.note,
-                        imageUrl: item.imageUrl,
-                        textPosition: { x: item.x, y: item.y },
-                        fontSize: item.fontSize,
-                        createdAt: item.createdAt
+                        id: item.id, note: item.note, imageUrl: item.imageUrl,
+                        textPosition: { x: item.x, y: item.y }, fontSize: item.fontSize, createdAt: item.createdAt
                     };
                 });
                 renderList();
             } catch (error) {
-                alert("Lỗi khi tải dữ liệu từ Google Sheet. Vui lòng thử lại!");
+                console.error(error);
+                alert("Bạn chưa có mẫu nào trên hệ thống hoặc mạng yếu.");
             }
             showLoading(false);
         }
@@ -155,12 +147,9 @@
                 return;
             }
 
-            // Sắp xếp mẫu mới nhất lên đầu
             keys.sort((a, b) => b - a).forEach(id => {
                 const tpl = templates[id];
                 const baseUrl = window.location.href.split('setup.html')[0];
-                
-                // LINK ĐÃ ĐƯỢC RÚT GỌN CHỈ CÒN ID
                 const finalLink = `${baseUrl}index.html?id=${id}`;
 
                 const div = document.createElement('div');
@@ -187,11 +176,9 @@
             document.getElementById('noteInput').value = '';
             document.getElementById('imgUrl').value = '';
             tempPosition = { x: 0.5, y: 0.152 };
-            
             tempFontSize = 80;
             document.getElementById('previewSize').value = 80;
             document.getElementById('previewSizeValue').innerText = 80;
-            
             updateCoordsDisplay();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -233,9 +220,6 @@
                 canvas.height = currentImg.height;
                 drawPreview();
             };
-            currentImg.onerror = () => {
-                alert("Link ảnh bị lỗi hoặc không hỗ trợ.");
-            };
         }
 
         function drawPreview() {
@@ -261,7 +245,7 @@
 
         function updateCoordsDisplay() { document.getElementById('valX').innerText = tempPosition.x; document.getElementById('valY').innerText = tempPosition.y; }
 
-        // LƯU DỮ LIỆU LÊN GOOGLE SHEET
+        // LƯU DỮ LIỆU LÊN GOOGLE SHEET - SỬ DỤNG CHUẨN FORM CHỐNG LỖI CORS
         async function saveTemplate() {
             const id = document.getElementById('currentId').value || Date.now().toString(); 
             const note = document.getElementById('noteInput').value || "Thiệp không tên";
@@ -270,41 +254,39 @@
 
             const payload = {
                 action: 'save',
-                id: id,
-                note: note,
-                imageUrl: imageUrl,
-                x: tempPosition.x,
-                y: tempPosition.y,
-                fontSize: tempFontSize
+                id: id, note: note, imageUrl: imageUrl,
+                x: tempPosition.x, y: tempPosition.y, fontSize: tempFontSize
             };
 
             showLoading(true);
             try {
+                // Đóng gói dữ liệu giống như gửi một biểu mẫu web thông thường (chống lỗi CORS)
+                const formData = new URLSearchParams();
+                formData.append("data", JSON.stringify(payload));
+
                 await fetch(API_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
+                    body: formData
                 });
                 alert('Đã lưu thành công lên Google Sheet!');
                 closeForm();
-                fetchTemplates(); // Tải lại danh sách
+                fetchTemplates(); 
             } catch (error) {
-                alert("Lỗi khi lưu lên Google Sheet!");
+                console.error(error);
+                alert("Lỗi mạng! Không thể kết nối tới Google.");
                 showLoading(false);
             }
         }
 
-        // XOÁ DỮ LIỆU TRÊN GOOGLE SHEET
         async function deleteTemplate(id) {
-            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này trên Google Sheet? Các link cũ sẽ lỗi.")) {
+            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này trên Google Sheet?")) {
                 showLoading(true);
                 try {
-                    await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: 'delete', id: id })
-                    });
-                    fetchTemplates(); // Tải lại danh sách
+                    const formData = new URLSearchParams();
+                    formData.append("data", JSON.stringify({ action: 'delete', id: id }));
+
+                    await fetch(API_URL, { method: 'POST', body: formData });
+                    fetchTemplates(); 
                 } catch(error) {
                     alert("Lỗi khi xoá dữ liệu!");
                     showLoading(false);
@@ -318,7 +300,6 @@
             }).catch(err => { prompt("Hãy copy thủ công link sau:", link); });
         }
 
-        // Chạy lần đầu khi mở trang
         fetchTemplates();
     </script>
 </body>

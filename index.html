@@ -170,6 +170,17 @@
                 .then(res => res.json())
                 .then(data => {
                     if (!data.error) {
+                        // KIỂM TRA HẾT HẠN NGAY TẠI ĐÂY
+                        if (data.endDate) {
+                            let end = new Date(data.endDate);
+                            end.setHours(23, 59, 59); // Hết ngày đó
+                            if (new Date() > end) {
+                                document.body.innerHTML = "<div style='color:white; text-align:center; padding: 40px; font-family: sans-serif;'><h2 style='font-size: 24px; margin-bottom: 10px;'>⚠️ Xin lỗi, thiệp mời đã hết hạn!</h2><p>Sự kiện này đã kết thúc. Vui lòng liên hệ người gửi nếu có sai sót.</p></div>";
+                                return; // Dừng việc vẽ thiệp
+                            }
+                        }
+
+                        // Nếu còn hạn thì nạp dữ liệu bình thường
                         activeConfig = {
                             imageUrl: data.imageUrl,
                             textPosition: { x: parseFloat(data.x), y: parseFloat(data.y) },

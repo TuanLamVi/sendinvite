@@ -10,6 +10,18 @@
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1, h2 { color: #e91e63; text-align: center; }
         
+        /* GIAO DIỆN ĐĂNG NHẬP */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #ff9a9e, #fbc2eb); display: flex; justify-content: center; align-items: center; z-index: 10000; }
+        .login-box { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 90%; max-width: 350px; text-align: center; }
+        .login-box h2 { margin-top: 0; color: #e91e63; margin-bottom: 20px; font-size: 22px; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #fbc2eb; border-radius: 8px; font-size: 16px; box-sizing: border-box; text-align: center; }
+        .login-box button { width: 100%; background: #e91e63; color: white; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .login-box button:hover { background: #d81b60; }
+        #loginError { color: red; font-size: 13px; margin-bottom: 10px; display: none; font-weight: bold; }
+
+        /* GIAO DIỆN QUẢN TRỊ */
+        #appContainer { display: none; } /* Mặc định ẩn toàn bộ trang quản trị */
+        
         .template-list { margin-bottom: 20px; border-bottom: 2px solid #fbc2eb; padding-bottom: 20px; }
         .template-item { background: #fff0f5; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #fbc2eb; flex-wrap: wrap; gap: 10px;}
         .template-info { flex: 1; min-width: 250px;}
@@ -34,6 +46,7 @@
         .btn-warning { background: #ff9800; color: white; }
         .btn-danger { background: #f44336; color: white; }
         .btn-info { background: #2196F3; color: white; }
+        .btn-logout { background: #9e9e9e; color: white; padding: 8px 15px; }
         
         canvas { width: 100%; border: 2px dashed #ccc; border-radius: 8px; cursor: crosshair; margin-top: 10px; }
         .note { font-size: 13px; color: #666; margin-top: 5px; }
@@ -42,20 +55,36 @@
         .spinner { border: 5px solid #f3f3f3; border-top: 5px solid #e91e63; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Nút phân trang */
         .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
         .page-btn { padding: 8px 15px; border: 1px solid #e91e63; background: white; color: #e91e63; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .page-btn.active { background: #e91e63; color: white; }
     </style>
 </head>
 <body>
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h2>🔒 KHOÁ BẢO MẬT</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Vui lòng nhập mật khẩu để vào trang quản trị thiệp</p>
+            <div id="loginError">Sai mật khẩu, vui lòng thử lại!</div>
+            <input type="password" id="passwordInput" placeholder="Nhập mật khẩu..." onkeypress="handleEnter(event)">
+            <button onclick="checkPassword()">ĐĂNG NHẬP</button>
+        </div>
+    </div>
+
+    <!-- MÀN HÌNH CHỜ -->
     <div id="loadingOverlay">
         <div class="spinner"></div>
         <h3 style="color: #e91e63; margin: 0;">Đang kết nối hệ thống...</h3>
     </div>
 
-    <div class="container">
-        <h1>⚙️ TRANG QUẢN TRỊ THIỆP</h1>
+    <!-- TOÀN BỘ GIAO DIỆN QUẢN TRỊ NẰM TRONG NÀY -->
+    <div id="appContainer" class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="margin: 0;">⚙️ TRANG QUẢN TRỊ</h1>
+            <button class="btn-logout" onclick="logout()">Đăng xuất 🔒</button>
+        </div>
+        <hr style="border: 1px solid #fbc2eb; margin: 15px 0 25px 0;">
         
         <div class="template-list">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
@@ -63,7 +92,6 @@
                 <button class="btn-primary" onclick="openCreateForm()" style="padding: 10px 20px; font-size: 16px;">+ TẠO THIỆP MỚI</button>
             </div>
             <div id="listContainer"></div>
-            <!-- Khu vực hiện phân trang -->
             <div class="pagination" id="paginationControls"></div>
         </div>
 
@@ -114,12 +142,58 @@
     </div>
 
     <script>
-        // DÁN API MỚI VÀO ĐÂY
+        // ==========================================
+        // TÙY CHỈNH CỦA BẠN NẰM Ở ĐÂY
+        // 1. Dán lại Link API Google Sheet
         const API_URL = "https://script.google.com/macros/s/AKfycbzp9xXRG9iZK1iLU8PVSuEfn4BxQaftQ9Vt6W-bTWgYEOGiD_rPgoIXH54kzrOaBpGnjg/exec";
         
+        // 2. ĐẶT MẬT KHẨU QUẢN TRỊ CỦA BẠN (Đổi chữ '123456' thành mật khẩu bạn muốn)
+        const ADMIN_PASSWORD = "Tuan2891@THIEP"; 
+        // ==========================================
+
+        // --- PHẦN XỬ LÝ ĐĂNG NHẬP ---
+        // Kiểm tra xem đã từng đăng nhập trên máy này chưa (để không bắt nhập lại nhiều lần)
+        window.onload = function() {
+            const isLogged = localStorage.getItem("invite_admin_logged");
+            if (isLogged === "yes") {
+                loginSuccess();
+            }
+        };
+
+        function checkPassword() {
+            const inputPass = document.getElementById("passwordInput").value;
+            if (inputPass === ADMIN_PASSWORD) {
+                // Nhập đúng
+                localStorage.setItem("invite_admin_logged", "yes");
+                loginSuccess();
+            } else {
+                // Nhập sai
+                document.getElementById("loginError").style.display = "block";
+                document.getElementById("passwordInput").value = "";
+                document.getElementById("passwordInput").focus();
+            }
+        }
+
+        // Bấm phím Enter để đăng nhập
+        function handleEnter(e) {
+            if (e.key === 'Enter') checkPassword();
+        }
+
+        function loginSuccess() {
+            document.getElementById("loginOverlay").style.display = "none";
+            document.getElementById("appContainer").style.display = "block";
+            fetchTemplates(); // Bắt đầu tải dữ liệu sau khi vào trong
+        }
+
+        function logout() {
+            localStorage.removeItem("invite_admin_logged");
+            location.reload(); // Tải lại trang để hiện form đăng nhập
+        }
+        // ------------------------------
+
         let templates = {}; 
         let currentPage = 1;
-        const itemsPerPage = 5; // Số thiệp hiển thị trên 1 trang
+        const itemsPerPage = 5; 
         
         const canvas = document.getElementById('previewCanvas');
         const ctx = canvas.getContext('2d');
@@ -162,30 +236,27 @@
             container.innerHTML = '';
             pagination.innerHTML = '';
             
-            const keys = Object.keys(templates).sort((a, b) => b - a); // Mới nhất lên đầu
+            const keys = Object.keys(templates).sort((a, b) => b - a);
             
             if (keys.length === 0) {
                 container.innerHTML = '<p style="text-align:center; color:#888;">Bạn chưa có mẫu thiệp nào. Hãy khởi tạo thiệp mới.</p>';
                 return;
             }
 
-            // Tính toán phân trang
             const totalPages = Math.ceil(keys.length / itemsPerPage);
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const currentKeys = keys.slice(startIndex, endIndex);
 
-            // Hiển thị danh sách thiệp
             currentKeys.forEach(id => {
                 const tpl = templates[id];
                 const baseUrl = window.location.href.split('setup.html')[0];
                 const finalLink = `${baseUrl}index.html?id=${id}`;
 
-                // Tính toán trạng thái hết hạn
                 let statusBadge = `<span class="badge-none">Không đặt hạn</span>`;
                 if (tpl.endDate) {
                     const end = new Date(tpl.endDate);
-                    end.setHours(23, 59, 59); // Cuối ngày đó mới hết hạn
+                    end.setHours(23, 59, 59);
                     if (new Date() > end) {
                         statusBadge = `<span class="badge-expired">Hết hạn</span>`;
                     } else {
@@ -193,7 +264,6 @@
                     }
                 }
 
-                // Chuyển format ngày hết hạn để hiển thị
                 let endDateDisplay = tpl.endDate ? new Date(tpl.endDate).toLocaleDateString('vi-VN') : "Không";
 
                 const div = document.createElement('div');
@@ -216,7 +286,6 @@
                 container.appendChild(div);
             });
 
-            // Hiển thị nút phân trang
             if (totalPages > 1) {
                 for (let i = 1; i <= totalPages; i++) {
                     const btn = document.createElement('button');
@@ -309,7 +378,7 @@
             const id = document.getElementById('currentId').value || Date.now().toString(); 
             const note = document.getElementById('noteInput').value || "Thiệp không tên";
             const imageUrl = document.getElementById('imgUrl').value.trim();
-            const endDate = document.getElementById('endDateInput').value; // Lấy giá trị ngày
+            const endDate = document.getElementById('endDateInput').value; 
 
             if(!imageUrl) return alert("Vui lòng dán link ảnh nền!");
 
@@ -329,25 +398,23 @@
                 closeForm();
                 fetchTemplates(); 
             } catch (error) {
-                alert("Lỗi mạng! Không thể kết nối dữ liệu.");
+                alert("Lỗi mạng! Không thể kết nối tới dữ liệu.");
                 showLoading(false);
             }
         }
 
         async function deleteTemplate(id) {
-            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này không?")) {
+            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này?")) {
                 showLoading(true);
                 try {
                     const formData = new URLSearchParams();
                     formData.append("data", JSON.stringify({ action: 'delete', id: id }));
                     await fetch(API_URL, { method: 'POST', body: formData });
                     
-                    // Nếu xóa hết ở trang hiện tại, lùi về trang trước
                     const currentKeysCount = Object.keys(templates).length - 1;
                     if (currentKeysCount > 0 && Math.ceil(currentKeysCount / itemsPerPage) < currentPage) {
                         currentPage--;
                     }
-                    
                     fetchTemplates(); 
                 } catch(error) {
                     alert("Lỗi khi xoá dữ liệu!");
@@ -361,8 +428,6 @@
                 alert("Đã copy link thành công!");
             }).catch(err => { prompt("Hãy copy thủ công link sau:", link); });
         }
-
-        fetchTemplates();
     </script>
 </body>
 </html>

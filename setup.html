@@ -10,23 +10,27 @@
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1, h2 { color: #e91e63; text-align: center; }
         
-        .template-list { margin-bottom: 30px; border-bottom: 2px solid #fbc2eb; padding-bottom: 20px; }
-        .template-item { background: #fff0f5; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #fbc2eb; }
-        .template-info { flex: 1; }
+        .template-list { margin-bottom: 20px; border-bottom: 2px solid #fbc2eb; padding-bottom: 20px; }
+        .template-item { background: #fff0f5; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #fbc2eb; flex-wrap: wrap; gap: 10px;}
+        .template-info { flex: 1; min-width: 250px;}
         .template-note { font-weight: bold; font-size: 16px; color: #d81b60; margin-bottom: 5px; }
-        .template-id { font-size: 12px; color: #888; }
-        .template-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;}
+        .template-id { font-size: 13px; color: #666; line-height: 1.5; }
         
-        .edit-section { background: #fafafa; padding: 20px; border-radius: 8px; border: 1px dashed #ccc; display: none; }
+        .badge-active { background: #4CAF50; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-expired { background: #f44336; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .badge-none { background: #9e9e9e; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+
+        .template-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;}
+        
+        .edit-section { background: #fafafa; padding: 20px; border-radius: 8px; border: 1px dashed #ccc; display: none; margin-top: 20px; }
         .form-group { margin-bottom: 15px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         label { font-weight: bold; display: block; margin-bottom: 8px; color: #e91e63; }
-        input[type="text"] { width: 100%; padding: 10px; border: 2px solid #fbc2eb; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        input[type="text"], input[type="date"] { width: 100%; padding: 10px; border: 2px solid #fbc2eb; border-radius: 8px; box-sizing: border-box; font-size: 15px; font-family: inherit;}
         
-        button { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; }
+        button { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
         .btn-primary { background: #e91e63; color: white; }
         .btn-primary:hover { background: #d81b60; }
         .btn-success { background: #4CAF50; color: white; }
-        .btn-success:hover { background: #45a049; }
         .btn-warning { background: #ff9800; color: white; }
         .btn-danger { background: #f44336; color: white; }
         .btn-info { background: #2196F3; color: white; }
@@ -37,13 +41,17 @@
         #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { border: 5px solid #f3f3f3; border-top: 5px solid #e91e63; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Nút phân trang */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 15px; }
+        .page-btn { padding: 8px 15px; border: 1px solid #e91e63; background: white; color: #e91e63; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .page-btn.active { background: #e91e63; color: white; }
     </style>
 </head>
 <body>
     <div id="loadingOverlay">
         <div class="spinner"></div>
-        <h3 style="color: #e91e63; margin: 0;">Đang kết nối Google Sheet...</h3>
-        <p style="color: #666; font-size: 14px;">Vui lòng đợi vài giây!</p>
+        <h3 style="color: #e91e63; margin: 0;">Đang kết nối hệ thống...</h3>
     </div>
 
     <div class="container">
@@ -51,61 +59,67 @@
         
         <div class="template-list">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin: 0;">Danh sách thiệp của bạn</h2>
-                <button class="btn-primary" onclick="openCreateForm()" style="padding: 10px 20px; font-size: 16px;">+ KHỞI TẠO THIỆP MỚI</button>
+                <h2 style="margin: 0;">Danh sách thiệp</h2>
+                <button class="btn-primary" onclick="openCreateForm()" style="padding: 10px 20px; font-size: 16px;">+ TẠO THIỆP MỚI</button>
             </div>
             <div id="listContainer"></div>
+            <!-- Khu vực hiện phân trang -->
+            <div class="pagination" id="paginationControls"></div>
         </div>
 
         <div class="edit-section" id="editSection">
-            <h2 id="formTitle">Tạo Mẫu Thiệp Mới</h2>
+            <h2 id="formTitle" style="margin-top: 0;">✨ Khởi Tạo Mẫu Thiệp Mới</h2>
             <input type="hidden" id="currentId">
             
             <div class="form-group">
-                <label>✏️ Ghi chú (Ví dụ: Thiệp cưới Hùng & Mai):</label>
+                <label>✏️ 1. Ghi chú (Ví dụ: Thiệp cưới Hùng & Mai):</label>
                 <input type="text" id="noteInput" placeholder="Nhập ghi chú để dễ nhớ...">
+            </div>
+
+            <div class="form-group" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label>🔠 2. Cỡ chữ mặc định:</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="range" id="previewSize" min="40" max="280" value="80" step="2" style="flex: 1; accent-color: #e91e63;" oninput="updatePreviewSize()">
+                        <span id="previewSizeValue" style="font-weight: bold; color: #e91e63;">80</span>
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <label>⏳ 3. Ngày hết hạn (Tùy chọn):</label>
+                    <input type="date" id="endDateInput">
+                </div>
             </div>
 
             <div class="form-group" style="border: 2px dashed #4CAF50; background: #e8f5e9;">
                 <div style="text-align: center; margin-bottom: 15px;">
-                    <p style="margin-top: 0; color: #2e7d32; font-weight: bold; font-size: 15px;">BƯỚC 1: TẢI ẢNH TỪ ĐIỆN THOẠI LÊN MẠNG</p>
-                    <a href="https://postimages.org/" target="_blank" style="display: inline-block; background: #2e7d32; color: white; padding: 12px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">MỞ TRANG TẢI ẢNH MIỄN PHÍ</a>
-                    <p style="font-size: 13px; color: #555; margin-bottom: 0; margin-top: 10px;">(Tại trang web mới, tải ảnh lên rồi copy dòng <b>"Direct link"</b> hoặc <b>"Đường dẫn trực tiếp"</b>)</p>
+                    <a href="https://postimages.org/" target="_blank" style="display: inline-block; background: #2e7d32; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">TẢI ẢNH TỪ ĐIỆN THOẠI LÊN MẠNG</a>
+                    <p style="font-size: 13px; color: #555; margin: 0; margin-top: 8px;">(Tải ảnh lên web mới rồi copy dòng <b>"Direct link"</b>)</p>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label>🖼️ BƯỚC 2: Dán link ảnh nền bạn vừa copy vào đây:</label>
+                <label>🖼️ 4. Dán link ảnh nền bạn vừa copy vào đây:</label>
                 <input type="text" id="imgUrl" placeholder="Dán link (Direct link) vào đây...">
                 <button type="button" class="btn-success" onclick="loadImage()" style="margin-top: 10px; width: 100%;">Cập nhật ảnh để xem trước</button>
             </div>
 
             <div class="form-group">
-                <label>🔠 BƯỚC 3: Cỡ chữ mặc định:</label>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <input type="range" id="previewSize" min="40" max="280" value="80" step="2" style="flex: 1; accent-color: #e91e63;" oninput="updatePreviewSize()">
-                    <span id="previewSizeValue" style="font-weight: bold; color: #e91e63; font-size: 16px; min-width: 30px; text-align: center;">80</span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>🎯 BƯỚC 4: Click trực tiếp vào ảnh bên dưới để chọn vị trí chữ:</label>
-                <div class="note">Toạ độ X: <span id="valX" style="font-weight:bold;color:#e91e63">0.5</span> | Toạ độ Y: <span id="valY" style="font-weight:bold;color:#e91e63">0.152</span></div>
+                <label>🎯 5. Click trực tiếp vào ảnh bên dưới để chọn vị trí chữ:</label>
+                <div class="note">Toạ độ X: <span id="valX" style="color:#e91e63; font-weight:bold;">0.5</span> | Y: <span id="valY" style="color:#e91e63; font-weight:bold;">0.152</span></div>
                 <canvas id="previewCanvas"></canvas>
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-primary" onclick="saveTemplate()" style="flex: 1; padding: 12px;">💾 LƯU THIỆP MỜI</button>
-                <button onclick="closeForm()" style="padding: 12px; background: #ccc; color: black;">Huỷ bỏ</button>
+                <button class="btn-primary" onclick="saveTemplate()" style="flex: 1; padding: 12px; font-size: 15px;">💾 LƯU THIỆP NÀY</button>
+                <button onclick="closeForm()" style="padding: 12px; background: #ccc; color: black; font-size: 15px;">Huỷ bỏ</button>
             </div>
         </div>
     </div>
 
     <script>
-        // LIÊN KẾT API GOOGLE SHEET
-        const API_URL = "https://script.google.com/macros/s/AKfycbzZ8d6YmBQwYF1hNaHUYWqZBQQ4p3z1Uuu3NrV4VJMKJXKp9It0kdLkYdSAED65aQTRQw/exec";
+        // DÁN API MỚI VÀO ĐÂY
+        const API_URL = "https://script.google.com/macros/s/AKfycbzp9xXRG9iZK1iLU8PVSuEfn4BxQaftQ9Vt6W-bTWgYEOGiD_rPgoIXH54kzrOaBpGnjg/exec";
         
         let templates = {}; 
+        let currentPage = 1;
+        const itemsPerPage = 5; // Số thiệp hiển thị trên 1 trang
         
         const canvas = document.getElementById('previewCanvas');
         const ctx = canvas.getContext('2d');
@@ -126,47 +140,92 @@
                 data.forEach(item => {
                     templates[item.id] = {
                         id: item.id, note: item.note, imageUrl: item.imageUrl,
-                        textPosition: { x: item.x, y: item.y }, fontSize: item.fontSize, createdAt: item.createdAt
+                        textPosition: { x: item.x, y: item.y }, fontSize: item.fontSize, 
+                        createdAt: item.createdAt, endDate: item.endDate
                     };
                 });
                 renderList();
             } catch (error) {
-                console.error(error);
-                alert("Bạn chưa có mẫu nào trên hệ thống hoặc mạng yếu.");
+                alert("Lỗi tải dữ liệu. Vui lòng kiểm tra kết nối mạng.");
             }
             showLoading(false);
         }
 
+        function changePage(page) {
+            currentPage = page;
+            renderList();
+        }
+
         function renderList() {
             const container = document.getElementById('listContainer');
+            const pagination = document.getElementById('paginationControls');
             container.innerHTML = '';
+            pagination.innerHTML = '';
             
-            const keys = Object.keys(templates);
+            const keys = Object.keys(templates).sort((a, b) => b - a); // Mới nhất lên đầu
+            
             if (keys.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#888;">Bạn chưa có mẫu thiệp nào trên Google Sheet. Hãy bấm "Khởi tạo thiệp mới".</p>';
+                container.innerHTML = '<p style="text-align:center; color:#888;">Bạn chưa có mẫu thiệp nào. Hãy khởi tạo thiệp mới.</p>';
                 return;
             }
 
-            keys.sort((a, b) => b - a).forEach(id => {
+            // Tính toán phân trang
+            const totalPages = Math.ceil(keys.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentKeys = keys.slice(startIndex, endIndex);
+
+            // Hiển thị danh sách thiệp
+            currentKeys.forEach(id => {
                 const tpl = templates[id];
                 const baseUrl = window.location.href.split('setup.html')[0];
                 const finalLink = `${baseUrl}index.html?id=${id}`;
+
+                // Tính toán trạng thái hết hạn
+                let statusBadge = `<span class="badge-none">Không đặt hạn</span>`;
+                if (tpl.endDate) {
+                    const end = new Date(tpl.endDate);
+                    end.setHours(23, 59, 59); // Cuối ngày đó mới hết hạn
+                    if (new Date() > end) {
+                        statusBadge = `<span class="badge-expired">Hết hạn</span>`;
+                    } else {
+                        statusBadge = `<span class="badge-active">Đang còn hạn</span>`;
+                    }
+                }
+
+                // Chuyển format ngày hết hạn để hiển thị
+                let endDateDisplay = tpl.endDate ? new Date(tpl.endDate).toLocaleDateString('vi-VN') : "Không";
 
                 const div = document.createElement('div');
                 div.className = 'template-item';
                 div.innerHTML = `
                     <div class="template-info">
-                        <div class="template-note">${tpl.note || "Không có ghi chú"}</div>
-                        <div class="template-id">ID: ${id} | Cỡ chữ: ${tpl.fontSize || 80}px<br>Tạo lúc: ${tpl.createdAt || ""}</div>
+                        <div class="template-note">${tpl.note || "Không có ghi chú"} ${statusBadge}</div>
+                        <div class="template-id">
+                            Cỡ chữ: ${tpl.fontSize || 80}px | Hạn: ${endDateDisplay} <br>
+                            Tạo lúc: ${tpl.createdAt || ""}
+                        </div>
                     </div>
                     <div class="template-actions">
-                        <button class="btn-info" onclick="copyLink('${finalLink}')">🔗 Copy Link Khách</button>
+                        <button class="btn-success" onclick="window.open('${finalLink}', '_blank')">👁️ Mở thiệp</button>
+                        <button class="btn-info" onclick="copyLink('${finalLink}')">🔗 Copy Link</button>
                         <button class="btn-warning" onclick="editTemplate('${id}')">✏️ Sửa</button>
                         <button class="btn-danger" onclick="deleteTemplate('${id}')">🗑️ Xoá</button>
                     </div>
                 `;
                 container.appendChild(div);
             });
+
+            // Hiển thị nút phân trang
+            if (totalPages > 1) {
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                    btn.innerText = `Trang ${i}`;
+                    btn.onclick = () => changePage(i);
+                    pagination.appendChild(btn);
+                }
+            }
         }
 
         function openCreateForm() {
@@ -175,6 +234,7 @@
             document.getElementById('currentId').value = '';
             document.getElementById('noteInput').value = '';
             document.getElementById('imgUrl').value = '';
+            document.getElementById('endDateInput').value = '';
             tempPosition = { x: 0.5, y: 0.152 };
             tempFontSize = 80;
             document.getElementById('previewSize').value = 80;
@@ -191,10 +251,10 @@
             document.getElementById('currentId').value = id;
             document.getElementById('noteInput').value = tpl.note;
             document.getElementById('imgUrl').value = tpl.imageUrl;
+            document.getElementById('endDateInput').value = tpl.endDate || '';
             
             tempPosition = { x: tpl.textPosition.x, y: tpl.textPosition.y };
             tempFontSize = tpl.fontSize || 80;
-            
             document.getElementById('previewSize').value = tempFontSize;
             document.getElementById('previewSizeValue').innerText = tempFontSize;
 
@@ -245,34 +305,30 @@
 
         function updateCoordsDisplay() { document.getElementById('valX').innerText = tempPosition.x; document.getElementById('valY').innerText = tempPosition.y; }
 
-        // LƯU DỮ LIỆU LÊN GOOGLE SHEET - SỬ DỤNG CHUẨN FORM CHỐNG LỖI CORS
         async function saveTemplate() {
             const id = document.getElementById('currentId').value || Date.now().toString(); 
             const note = document.getElementById('noteInput').value || "Thiệp không tên";
             const imageUrl = document.getElementById('imgUrl').value.trim();
-            if(!imageUrl) return alert("Vui lòng tải ảnh lên hoặc dán link ảnh!");
+            const endDate = document.getElementById('endDateInput').value; // Lấy giá trị ngày
+
+            if(!imageUrl) return alert("Vui lòng dán link ảnh nền!");
 
             const payload = {
                 action: 'save',
                 id: id, note: note, imageUrl: imageUrl,
-                x: tempPosition.x, y: tempPosition.y, fontSize: tempFontSize
+                x: tempPosition.x, y: tempPosition.y, fontSize: tempFontSize,
+                endDate: endDate
             };
 
             showLoading(true);
             try {
-                // Đóng gói dữ liệu giống như gửi một biểu mẫu web thông thường (chống lỗi CORS)
                 const formData = new URLSearchParams();
                 formData.append("data", JSON.stringify(payload));
-
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                alert('Đã lưu thành công!');
+                await fetch(API_URL, { method: 'POST', body: formData });
+                alert('Đã lưu thành công lên Google Sheet!');
                 closeForm();
                 fetchTemplates(); 
             } catch (error) {
-                console.error(error);
                 alert("Lỗi mạng! Không thể kết nối tới Google.");
                 showLoading(false);
             }
@@ -284,8 +340,14 @@
                 try {
                     const formData = new URLSearchParams();
                     formData.append("data", JSON.stringify({ action: 'delete', id: id }));
-
                     await fetch(API_URL, { method: 'POST', body: formData });
+                    
+                    // Nếu xóa hết ở trang hiện tại, lùi về trang trước
+                    const currentKeysCount = Object.keys(templates).length - 1;
+                    if (currentKeysCount > 0 && Math.ceil(currentKeysCount / itemsPerPage) < currentPage) {
+                        currentPage--;
+                    }
+                    
                     fetchTemplates(); 
                 } catch(error) {
                     alert("Lỗi khi xoá dữ liệu!");
@@ -296,7 +358,7 @@
 
         function copyLink(link) {
             navigator.clipboard.writeText(link).then(() => {
-                alert("Đã copy link! Gửi ngay cho khách.\nLink của bạn: " + link);
+                alert("Đã copy link thành công!");
             }).catch(err => { prompt("Hãy copy thủ công link sau:", link); });
         }
 

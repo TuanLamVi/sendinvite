@@ -325,17 +325,17 @@
                 const formData = new URLSearchParams();
                 formData.append("data", JSON.stringify(payload));
                 await fetch(API_URL, { method: 'POST', body: formData });
-                alert('Đã lưu thành công lên Google Sheet!');
+                alert('Đã lưu thành công!');
                 closeForm();
                 fetchTemplates(); 
             } catch (error) {
-                alert("Lỗi mạng! Không thể kết nối tới Google.");
+                alert("Lỗi mạng! Không thể kết nối dữ liệu.");
                 showLoading(false);
             }
         }
 
         async function deleteTemplate(id) {
-            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này trên Google Sheet?")) {
+            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này không?")) {
                 showLoading(true);
                 try {
                     const formData = new URLSearchParams();

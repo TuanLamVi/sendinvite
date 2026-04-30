@@ -6,7 +6,7 @@
     <title>Quản Trị Mẫu Thiệp</title>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Be Vietnam Pro', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+        body { font-family: 'Be Vietnam Pro', sans-serif; background: #f0f2f5; padding: 20px; color: #333; margin: 0; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         h1, h2 { color: #e91e63; text-align: center; }
         
@@ -33,9 +33,21 @@
         
         canvas { width: 100%; border: 2px dashed #ccc; border-radius: 8px; cursor: crosshair; margin-top: 10px; }
         .note { font-size: 13px; color: #666; margin-top: 5px; }
+        
+        /* Hiệu ứng tải dữ liệu */
+        #loadingOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 5px solid #f3f3f3; border-top: 5px solid #e91e63; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+    <!-- MÀN HÌNH CHỜ XỬ LÝ -->
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <h3 style="color: #e91e63; margin: 0;">Đang kết nối Google Sheet...</h3>
+        <p style="color: #666; font-size: 14px;">Vui lòng đợi vài giây!</p>
+    </div>
+
     <div class="container">
         <h1>⚙️ TRANG QUẢN TRỊ THIỆP</h1>
         
@@ -70,12 +82,11 @@
                 <button type="button" class="btn-success" onclick="loadImage()" style="margin-top: 10px; width: 100%;">Cập nhật ảnh để xem trước</button>
             </div>
 
-            <!-- PHẦN MỚI: CHỈNH CỠ CHỮ -->
             <div class="form-group">
                 <label>🔠 BƯỚC 3: Cỡ chữ mặc định:</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <input type="range" id="previewSize" min="20" max="120" value="40" step="2" style="flex: 1; accent-color: #e91e63;" oninput="updatePreviewSize()">
-                    <span id="previewSizeValue" style="font-weight: bold; color: #e91e63; font-size: 16px; min-width: 30px; text-align: center;">120</span>
+                    <input type="range" id="previewSize" min="40" max="280" value="80" step="2" style="flex: 1; accent-color: #e91e63;" oninput="updatePreviewSize()">
+                    <span id="previewSizeValue" style="font-weight: bold; color: #e91e63; font-size: 16px; min-width: 30px; text-align: center;">80</span>
                 </div>
             </div>
 
@@ -86,15 +97,17 @@
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-primary" onclick="saveTemplate()" style="flex: 1; padding: 12px;">💾 LƯU MẪU THIỆP NÀY</button>
+                <button class="btn-primary" onclick="saveTemplate()" style="flex: 1; padding: 12px;">💾 LƯU LÊN GOOGLE SHEET</button>
                 <button onclick="closeForm()" style="padding: 12px; background: #ccc; color: black;">Huỷ bỏ</button>
             </div>
         </div>
     </div>
 
     <script>
-        const DB_KEY = "myInviteManager";
-        let templates = JSON.parse(localStorage.getItem(DB_KEY)) || {};
+        // LIÊN KẾT API GOOGLE SHEET CỦA BẠN
+        const API_URL = "https://script.google.com/macros/s/AKfycbxWK9rCRVGoGSehVxMIxy_68_OwacwKiQyn8qgDcXgd_xB45jdwZJQAGM3zBwFLFFASjg/exec";
+        
+        let templates = {}; // Dữ liệu sẽ được kéo từ Google Sheet
         
         const canvas = document.getElementById('previewCanvas');
         const ctx = canvas.getContext('2d');
@@ -102,7 +115,35 @@
         currentImg.crossOrigin = "anonymous";
         
         let tempPosition = { x: 0.5, y: 0.152 };
-        let tempFontSize =80; // Biến lưu cỡ chữ
+        let tempFontSize = 80;
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        // KÉO DỮ LIỆU TỪ GOOGLE SHEET KHI MỞ TRANG
+        async function fetchTemplates() {
+            showLoading(true);
+            try {
+                let response = await fetch(API_URL + "?action=readAll");
+                let data = await response.json();
+                templates = {};
+                data.forEach(item => {
+                    templates[item.id] = {
+                        id: item.id,
+                        note: item.note,
+                        imageUrl: item.imageUrl,
+                        textPosition: { x: item.x, y: item.y },
+                        fontSize: item.fontSize,
+                        createdAt: item.createdAt
+                    };
+                });
+                renderList();
+            } catch (error) {
+                alert("Lỗi khi tải dữ liệu từ Google Sheet. Vui lòng thử lại!");
+            }
+            showLoading(false);
+        }
 
         function renderList() {
             const container = document.getElementById('listContainer');
@@ -110,29 +151,24 @@
             
             const keys = Object.keys(templates);
             if (keys.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:#888;">Bạn chưa có mẫu thiệp nào. Hãy bấm "Khởi tạo thiệp mới".</p>';
+                container.innerHTML = '<p style="text-align:center; color:#888;">Bạn chưa có mẫu thiệp nào trên Google Sheet. Hãy bấm "Khởi tạo thiệp mới".</p>';
                 return;
             }
 
+            // Sắp xếp mẫu mới nhất lên đầu
             keys.sort((a, b) => b - a).forEach(id => {
                 const tpl = templates[id];
                 const baseUrl = window.location.href.split('setup.html')[0];
                 
-                // Thêm tham số size vào link
-                const params = new URLSearchParams({ 
-                    img: tpl.imageUrl, 
-                    x: tpl.textPosition.x, 
-                    y: tpl.textPosition.y,
-                    size: tpl.fontSize || 120
-                });
-                const finalLink = `${baseUrl}index.html?${params.toString()}`;
+                // LINK ĐÃ ĐƯỢC RÚT GỌN CHỈ CÒN ID
+                const finalLink = `${baseUrl}index.html?id=${id}`;
 
                 const div = document.createElement('div');
                 div.className = 'template-item';
                 div.innerHTML = `
                     <div class="template-info">
                         <div class="template-note">${tpl.note || "Không có ghi chú"}</div>
-                        <div class="template-id">Cỡ chữ: ${tpl.fontSize || 120}px | Ngày tạo: ${new Date(parseInt(id)).toLocaleString('vi-VN')}</div>
+                        <div class="template-id">ID: ${id} | Cỡ chữ: ${tpl.fontSize || 80}px<br>Tạo lúc: ${tpl.createdAt || ""}</div>
                     </div>
                     <div class="template-actions">
                         <button class="btn-info" onclick="copyLink('${finalLink}')">🔗 Copy Link Khách</button>
@@ -152,10 +188,9 @@
             document.getElementById('imgUrl').value = '';
             tempPosition = { x: 0.5, y: 0.152 };
             
-            // Đặt lại cỡ chữ mặc định
-            tempFontSize = 120;
-            document.getElementById('previewSize').value = 120;
-            document.getElementById('previewSizeValue').innerText = 120;
+            tempFontSize = 80;
+            document.getElementById('previewSize').value = 80;
+            document.getElementById('previewSizeValue').innerText = 80;
             
             updateCoordsDisplay();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -171,9 +206,8 @@
             document.getElementById('imgUrl').value = tpl.imageUrl;
             
             tempPosition = { x: tpl.textPosition.x, y: tpl.textPosition.y };
+            tempFontSize = tpl.fontSize || 80;
             
-            // Nạp cỡ chữ cũ
-            tempFontSize = tpl.fontSize || 120;
             document.getElementById('previewSize').value = tempFontSize;
             document.getElementById('previewSizeValue').innerText = tempFontSize;
 
@@ -184,7 +218,6 @@
 
         function closeForm() { document.getElementById('editSection').style.display = 'none'; }
 
-        // Cập nhật cỡ chữ khi kéo thanh trượt
         function updatePreviewSize() {
             tempFontSize = parseInt(document.getElementById('previewSize').value);
             document.getElementById('previewSizeValue').innerText = tempFontSize;
@@ -194,7 +227,6 @@
         function loadImage() {
             const url = document.getElementById('imgUrl').value.trim();
             if(!url) return alert("Bạn chưa dán link ảnh!");
-            
             currentImg.src = url;
             currentImg.onload = () => {
                 canvas.width = currentImg.width;
@@ -202,7 +234,7 @@
                 drawPreview();
             };
             currentImg.onerror = () => {
-                alert("Link ảnh bị lỗi hoặc không hỗ trợ. Vui lòng đảm bảo bạn đã copy đúng dòng 'Direct link' / 'Đường dẫn trực tiếp'!");
+                alert("Link ảnh bị lỗi hoặc không hỗ trợ.");
             };
         }
 
@@ -211,14 +243,10 @@
             ctx.drawImage(currentImg, 0, 0);
             const textX = canvas.width * tempPosition.x;
             const textY = canvas.height * tempPosition.y;
-            
             ctx.fillStyle = "#e91e63"; 
-            // Dùng cỡ chữ động thay vì cố định 80px
             ctx.font = `${tempFontSize}px 'Be Vietnam Pro', sans-serif`;
-            ctx.textAlign = "center"; 
-            ctx.textBaseline = "bottom";
+            ctx.textAlign = "center"; ctx.textBaseline = "bottom";
             ctx.fillText("Tên Mẫu", textX, textY);
-            
             ctx.fillStyle = "blue"; ctx.beginPath(); ctx.arc(textX, textY, 6, 0, Math.PI * 2); ctx.fill();
         }
 
@@ -233,35 +261,65 @@
 
         function updateCoordsDisplay() { document.getElementById('valX').innerText = tempPosition.x; document.getElementById('valY').innerText = tempPosition.y; }
 
-        function saveTemplate() {
+        // LƯU DỮ LIỆU LÊN GOOGLE SHEET
+        async function saveTemplate() {
             const id = document.getElementById('currentId').value || Date.now().toString(); 
             const note = document.getElementById('noteInput').value || "Thiệp không tên";
             const imageUrl = document.getElementById('imgUrl').value.trim();
             if(!imageUrl) return alert("Vui lòng tải ảnh lên hoặc dán link ảnh!");
 
-            // Lưu thêm thuộc tính fontSize
-            templates[id] = { id, note, imageUrl, textPosition: { ...tempPosition }, fontSize: tempFontSize };
-            localStorage.setItem(DB_KEY, JSON.stringify(templates));
-            alert('Đã lưu thành công!');
-            closeForm();
-            renderList();
+            const payload = {
+                action: 'save',
+                id: id,
+                note: note,
+                imageUrl: imageUrl,
+                x: tempPosition.x,
+                y: tempPosition.y,
+                fontSize: tempFontSize
+            };
+
+            showLoading(true);
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+                alert('Đã lưu thành công lên Google Sheet!');
+                closeForm();
+                fetchTemplates(); // Tải lại danh sách
+            } catch (error) {
+                alert("Lỗi khi lưu lên Google Sheet!");
+                showLoading(false);
+            }
         }
 
-        function deleteTemplate(id) {
-            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này không?")) {
-                delete templates[id];
-                localStorage.setItem(DB_KEY, JSON.stringify(templates));
-                renderList();
+        // XOÁ DỮ LIỆU TRÊN GOOGLE SHEET
+        async function deleteTemplate(id) {
+            if(confirm("Bạn có chắc chắn muốn xoá mẫu thiệp này trên Google Sheet? Các link cũ sẽ lỗi.")) {
+                showLoading(true);
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: 'delete', id: id })
+                    });
+                    fetchTemplates(); // Tải lại danh sách
+                } catch(error) {
+                    alert("Lỗi khi xoá dữ liệu!");
+                    showLoading(false);
+                }
             }
         }
 
         function copyLink(link) {
             navigator.clipboard.writeText(link).then(() => {
-                alert("Đã copy link! Bạn có thể dán (Paste) để gửi cho khách.\n\nLink đã copy:\n" + link);
+                alert("Đã copy link! Gửi ngay cho khách.\nLink của bạn: " + link);
             }).catch(err => { prompt("Hãy copy thủ công link sau:", link); });
         }
 
-        renderList();
+        // Chạy lần đầu khi mở trang
+        fetchTemplates();
     </script>
 </body>
 </html>

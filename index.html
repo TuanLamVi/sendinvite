@@ -17,9 +17,10 @@
     <style>
         :root { --pink1: #ff9a9e; --pink3: #fbc2eb; }
         body { font-family: 'Be Vietnam Pro', sans-serif; margin: 0; background: linear-gradient(135deg, var(--pink1), var(--pink3)); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 420px; background: white; border-radius: 22px; padding: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+        .container { width: 100%; max-width: 420px; background: white; border-radius: 22px; padding: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); position: relative; }
         .canvas-wrapper { position: relative; }
         canvas { width: 100%; border-radius: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
         .popup { position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(255, 255, 255, 0.38); backdrop-filter: blur(10px); border-radius: 16px; padding: 10px 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); display: none; z-index: 20; border: 1px solid rgba(255,255,255,0.5); }
         .popup.active { bottom: 62px; }
         .popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -48,10 +49,21 @@
         .contact-btn .label { font-size: 12.5px; font-weight: 600; opacity: 0.85; line-height: 1; }
         .contact-btn .number { font-size: 17px; font-weight: 700; line-height: 1.2; margin-top: 2px; }
         .contact-support { margin-top: 16px; font-size: 13px; color: #e91e63; opacity: 0.9; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        
+        /* Hiệu ứng load trang chính */
+        #loader { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 22px; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
+        .loader-spin { border: 4px solid #fbc2eb; border-top: 4px solid #e91e63; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Loader chờ lấy dữ liệu -->
+        <div id="loader">
+            <div class="loader-spin"></div>
+            <div style="color:#e91e63; font-weight:bold; font-size: 14px;">Đang chuẩn bị thiệp...</div>
+        </div>
+
         <div class="canvas-wrapper" id="wrapper">
             <canvas id="canvas"></canvas>
           
@@ -80,8 +92,8 @@
                 <div class="section">
                     <label class="section-label">KÍCH THƯỚC CHỮ</label>
                     <div class="size-slider">
-                        <input type="range" id="size" min="40" max="280" value="120" step="2">
-                        <span id="size-value">120</span>
+                        <input type="range" id="size" min="40" max="280" value="80" step="2">
+                        <span id="size-value">80</span>
                     </div>
                 </div>
               
@@ -127,6 +139,8 @@
     </div>
 
     <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbxWK9rCRVGoGSehVxMIxy_68_OwacwKiQyn8qgDcXgd_xB45jdwZJQAGM3zBwFLFFASjg/exec";
+
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         const popup = document.getElementById("popup");
@@ -137,36 +151,59 @@
         const fontSelect = document.getElementById("font");
         const palette = document.getElementById("palette");
 
-        // ==================== ĐỌC DỮ LIỆU TỪ LINK ====================
-        const urlParams = new URLSearchParams(window.location.search);
-        
-        const imgFromUrl = urlParams.get('img');
-        const xFromUrl = urlParams.get('x');
-        const yFromUrl = urlParams.get('y');
-        const sizeFromUrl = urlParams.get('size'); // Lấy kích thước chữ từ link
-
+        // Cấu hình mặc định phòng hờ
         let activeConfig = { 
-            imageUrl: imgFromUrl || "https://raw.githubusercontent.com/TuanLamVi/sinhnhat/main/thiepmau7.png", 
-            textPosition: { 
-                x: xFromUrl ? parseFloat(xFromUrl) : 0.5, 
-                y: yFromUrl ? parseFloat(yFromUrl) : 0.152 
-            },
-            defaultFontSize: sizeFromUrl ? parseInt(sizeFromUrl) : 120
+            imageUrl: "https://raw.githubusercontent.com/TuanLamVi/sinhnhat/main/thiepmau7.png", 
+            textPosition: { x: 0.5, y: 0.152 },
+            defaultFontSize: 80
         };
 
-        // Gán cỡ chữ mặc định cho thanh trượt
-        sizeSlider.value = activeConfig.defaultFontSize;
-        sizeValue.textContent = activeConfig.defaultFontSize;
-        
         let img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = activeConfig.imageUrl;
 
-        img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            draw();
-        };
+        // ==================== KÉO DỮ LIỆU TỪ GOOGLE SHEET ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        const templateId = urlParams.get('id');
+
+        if (templateId) {
+            fetch(API_URL + "?action=read&id=" + templateId)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.error) {
+                        activeConfig = {
+                            imageUrl: data.imageUrl,
+                            textPosition: { x: parseFloat(data.x), y: parseFloat(data.y) },
+                            defaultFontSize: parseInt(data.fontSize) || 80
+                        };
+                    }
+                    initCanvas();
+                })
+                .catch(err => {
+                    initCanvas(); // Lỗi mạng thì load mặc định
+                });
+        } else {
+            initCanvas(); // Không có ID thì load mặc định
+        }
+
+        // ==================== KHỞI TẠO BẢN VẼ ====================
+        function initCanvas() {
+            // Gán cỡ chữ mặc định
+            sizeSlider.value = activeConfig.defaultFontSize;
+            sizeValue.textContent = activeConfig.defaultFontSize;
+            
+            img.src = activeConfig.imageUrl;
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                draw();
+                // Ẩn bảng chờ tải
+                document.getElementById('loader').style.display = 'none';
+            };
+            img.onerror = () => {
+                alert("Ảnh bị lỗi không tải được. Vui lòng kiểm tra lại đường link ảnh!");
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
 
         // ==================== XỬ LÝ MÀU VÀ VẼ ====================
         let currentColor = "#000000";
@@ -228,9 +265,7 @@
         }
 
         wrapper.addEventListener("click", (e) => {
-            if (e.target === wrapper || e.target === canvas) {
-                hidePopup();
-            }
+            if (e.target === wrapper || e.target === canvas) { hidePopup(); }
         });
 
         // ==================== TẢI XUỐNG & CHIA SẺ ====================

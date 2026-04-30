@@ -3,309 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THIỆP CƯỚI ONLINE</title>
+    <title>GỬI THIỆP ONLINE</title>
     
     <link rel="icon" href="https://raw.githubusercontent.com/TuanLamVi/invite/main/favicon.png" type="image/png">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script&family=Caveat&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-   
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/TuanLamVi/invite/main/favicon.png">
+    <meta property="og:title" content="THIỆP MỜI ONLINE">
+    <meta property="og:description" content="Gửi thiệp online giúp bạn tạo thiệp nhanh chóng, đẹp mắt chỉ trong một nốt nhạc.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/TuanLamVi/sendinvite/main/logo.jpg">
+    <meta property="og:url" content="https://tuanlamvi.github.io/invite/">
+  
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script&family=Caveat&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        :root {
-            --wedding-pink: #d98cb3;
-            --wedding-gold: #d4af37;
-            --wedding-light: #fff5f8;
-            --text-dark: #5a4a52;
-        }
-        body {
-            font-family: 'Be Vietnam Pro', sans-serif;
-            margin: 0;
-            background: linear-gradient(-45deg, #ffecd2, #fcb69f, #fbc2eb, #a6c1ee);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 15px;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .container {
-            width: 100%;
-            max-width: 420px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 28px;
-            padding: 20px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15), inset 0 0 0 2px rgba(255, 255, 255, 0.5);
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-        .header-title {
-            text-align: center;
-            font-family: 'Great Vibes', cursive;
-            font-size: 32px;
-            color: var(--wedding-pink);
-            margin-bottom: 15px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-        }
-        .canvas-wrapper { position: relative; width: 100%; }
-        canvas {
-            width: 100%;
-            display: block;
-            border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(217, 140, 179, 0.2);
-            border: 3px solid white;
-        }
-        .external-input {
-            width: 100%;
-            margin-top: 20px;
-            padding: 16px;
-            border-radius: 50px;
-            border: 1px solid rgba(217, 140, 179, 0.4);
-            background: linear-gradient(135deg, #ffffff, var(--wedding-light));
-            text-align: center;
-            font-size: 15px;
-            color: var(--wedding-pink);
-            font-weight: 600;
-            cursor: pointer;
-            outline: none;
-            box-shadow: 0 4px 15px rgba(217, 140, 179, 0.15);
-            transition: all 0.3s ease;
-        }
-        .external-input:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(217, 140, 179, 0.25); }
-        
-        /* OVERLAY VÀ POPUP BÂY GIỜ ĐỘC LẬP HOÀN TOÀN */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; display: none; z-index: 9998;
-        }
-        .overlay.active { display: block; }
-        
-        .popup {
-            position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
-            width: 92%; max-width: 400px;
-            background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
-            border-radius: 30px; padding: 25px 20px;
-            box-shadow: 0 -10px 40px rgba(217, 140, 179, 0.2); z-index: 9999;
-            transition: bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-        .popup.active { bottom: 25px; }
-        .popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .popup-title { font-size: 18px; font-weight: 700; color: var(--wedding-pink); display: flex; align-items: center; gap: 8px; }
-        .close-btn {
-            width: 34px; height: 34px; border: none; background: var(--wedding-light);
-            color: var(--wedding-pink); border-radius: 50%; font-size: 20px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: 0.3s;
-        }
-        .close-btn:hover { background: #ffe4ef; transform: rotate(90deg); }
-        .section { margin-bottom: 15px; width: 100%; }
-        .section-label { display: block; font-size: 11px; font-weight: 700; color: #8c7a82; margin-bottom: 6px; text-transform: uppercase; }
-        input[type="text"], select {
-            width: 100%; padding: 12px 15px; border-radius: 15px; border: 1px solid #ebd4df;
-            background: #fffcfd; font-size: 14px; outline: none; color: var(--text-dark); transition: 0.3s;
-        }
-        input[type="text"]:focus, select:focus { border-color: var(--wedding-pink); box-shadow: 0 0 0 3px rgba(217, 140, 179, 0.1); }
-        .size-slider { background: #fffcfd; padding: 10px 15px; border-radius: 15px; border: 1px solid #ebd4df; display: flex; align-items: center; gap: 12px; }
-        .size-slider input { flex: 1; accent-color: var(--wedding-pink); padding: 0; border: none; }
-        #size-value { font-weight: 700; color: var(--wedding-pink); min-width: 30px; text-align: right; }
-        .palette { display: flex; justify-content: space-between; gap: 5px; padding: 5px 0; }
-        .color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.15); transition: 0.2s; }
-        .color-dot:active { transform: scale(0.8); }
-        .action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 25px; }
-        .btn { padding: 14px; border-radius: 20px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 6px 15px rgba(0,0,0,0.1); transition: 0.3s; }
-        .btn:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .btn-download { background: linear-gradient(135deg, #e6c27a, #d4af37); color: #fff; }
-        .btn-share { background: linear-gradient(135deg, #f3a183, #ec6f66); }
-        .contact-footer { margin-top: 25px; padding: 20px; background: linear-gradient(to bottom, #ffffff, var(--wedding-light)); border-radius: 24px; text-align: center; box-shadow: 0 4px 15px rgba(217, 140, 179, 0.08); border: 1px solid rgba(217, 140, 179, 0.2); }
-        .contact-title { font-weight: 600; color: var(--wedding-pink); font-size: 13px; text-transform: uppercase; margin-bottom: 15px; }
-        .contact-row { display: flex; gap: 12px; }
-        .contact-btn { flex: 1; background: white; border-radius: 18px; padding: 12px 5px; text-decoration: none; color: var(--text-dark); border: 1px solid #ebd4df; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-        .contact-btn:hover { border-color: var(--wedding-pink); transform: translateY(-3px); box-shadow: 0 8px 15px rgba(217, 140, 179, 0.15); }
-        .contact-icon { font-size: 24px; line-height: 1; margin-bottom: 2px; }
-        .contact-label { font-size: 11px; color: #8c7a82; }
-        .contact-number { font-size: 14px; font-weight: 700; color: var(--wedding-pink); }
+        /* GIỮ NGUYÊN CSS GỐC CỦA BẠN */
+        :root { --pink1: #ff9a9e; --pink3: #fbc2eb; }
+        body { font-family: 'Be Vietnam Pro', sans-serif; margin: 0; background: linear-gradient(135deg, var(--pink1), var(--pink3)); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 420px; background: white; border-radius: 22px; padding: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+        .canvas-wrapper { position: relative; }
+        canvas { width: 100%; border-radius: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .popup { position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(255, 255, 255, 0.38); backdrop-filter: blur(10px); border-radius: 16px; padding: 10px 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); display: none; z-index: 20; border: 1px solid rgba(255,255,255,0.5); }
+        .popup.active { bottom: 62px; }
+        .popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .popup-title { font-size: 14.5px; font-weight: 600; color: #e91e63; }
+        .close-btn { width: 34px; height: 34px; border: none; background: #ff1744; color: white; border-radius: 50%; font-size: 22px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(255,23,68,0.3); }
+        .section { margin-bottom: 7px; }
+        .section-label { font-size: 11.5px; font-weight: 600; color: #e91e63; margin-bottom: 3px; }
+        input, select { width: 100%; padding: 9px 11px; border-radius: 11px; border: 2px solid #f8c4d0; font-size: 14.8px; outline: none; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #e91e63; }
+        .size-slider { background: rgba(248,248,248,0.9); padding: 7px 11px; border-radius: 11px; display: flex; align-items: center; gap: 9px; }
+        .size-slider input[type="range"] { flex: 1; accent-color: #e91e63; }
+        #size-value { font-weight: 700; font-size: 15.5px; min-width: 36px; text-align: center; color: #e91e63; }
+        .palette { display: flex; justify-content: space-around; margin: 5px 0 3px 0; }
+        .color-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .action-group { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
+        button { padding: 11px; border-radius: 11px; border: none; font-weight: 600; font-size: 14.5px; cursor: pointer; }
+        .btn-download { background: linear-gradient(135deg, #ff758c, #ff7eb3); color: white; }
+        .btn-share { background: linear-gradient(135deg, #36d1dc, #5b86e5); color: white; }
+        .contact-footer { margin-top: 26px; padding: 20px 18px; background: linear-gradient(135deg, #fff0f5, #ffe4f0); border-radius: 20px; border: 3px solid #ff9a9e; box-shadow: 0 8px 25px rgba(233, 30, 99, 0.22); text-align: center; }
+        .contact-title { font-size: 14px; font-weight: 700; color: #e91e63; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; letter-spacing: 0.6px; }
+        .contact-row { display: flex; gap: 12px; justify-content: center; }
+        .contact-btn { flex: 1; max-width: 175px; background: white; border-radius: 16px; padding: 14px 12px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: #e91e63; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid #f8c4d0; }
+        .contact-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 12px 25px rgba(233, 30, 99, 0.3); border-color: #ff9a9e; }
+        .contact-btn .icon { font-size: 32px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(233, 30, 99, 0.2)); }
+        .contact-btn div { text-align: left; }
+        .contact-btn .label { font-size: 12.5px; font-weight: 600; opacity: 0.85; line-height: 1; }
+        .contact-btn .number { font-size: 17px; font-weight: 700; line-height: 1.2; margin-top: 2px; }
+        .contact-support { margin-top: 16px; font-size: 13px; color: #e91e63; opacity: 0.9; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 4px; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <div class="header-title">Thiệp Mời Của Chúng Mình</div>
-
-        <div class="canvas-wrapper">
+        <div class="canvas-wrapper" id="wrapper">
             <canvas id="canvas"></canvas>
+          
+            <div class="popup" id="popup">
+                <div class="popup-header">
+                    <div class="popup-title">✏️ Chỉnh sửa thiệp</div>
+                    <button class="close-btn" onclick="hidePopup()">×</button>
+                </div>
+              
+                <div class="section">
+                    <label class="section-label">NỘI DUNG</label>
+                    <input type="text" id="text" placeholder="Nhập tên khách mời...">
+                </div>
+              
+                <div class="section">
+                    <label class="section-label">KIỂU CHỮ</label>
+                    <select id="font">
+                        <option value="'Great Vibes'">Great Vibes - Sang trọng</option>
+                        <option value="'Dancing Script'">Dancing Script</option>
+                        <option value="'Caveat'">Caveat - Viết tay</option>
+                        <option value="'Be Vietnam Pro'">Be Vietnam Pro</option>
+                        <option value="Arial">Arial</option>
+                    </select>
+                </div>
+              
+                <div class="section">
+                    <label class="section-label">KÍCH THƯỚC CHỮ</label>
+                    <div class="size-slider">
+                        <input type="range" id="size" min="40" max="280" value="120" step="2">
+                        <span id="size-value">120</span>
+                    </div>
+                </div>
+              
+                <div class="section">
+                    <label class="section-label">MÀU CHỮ</label>
+                    <div class="palette" id="palette"></div>
+                </div>
+              
+                <div class="action-group">
+                    <button class="btn-download" onclick="save()">📥 TẢI VỀ</button>
+                    <button class="btn-share" onclick="share()">📤 GỬI</button>
+                </div>
+            </div>
         </div>
+      
+        <input type="text" placeholder="Bấm vào đây để chỉnh nội dung thiệp..."
+               onclick="showPopup()" style="margin-top:12px; text-align:center; font-size:15px;">
         
-        <input type="text" readonly class="external-input" 
-               placeholder="✨ Chạm để viết tên khách mời ✨" 
-               onclick="showPopup()">
-
         <div class="contact-footer">
-            <div class="contact-title">Hỗ Trợ Thiết Kế Thiệp</div>
+            <div class="contact-title">
+                ❤️ Liên hệ hỗ trợ ngay
+            </div>
             <div class="contact-row">
                 <a href="tel:0984062140" class="contact-btn">
-                    <span class="contact-icon">📞</span>
-                    <span class="contact-label">Gọi điện ngay</span>
-                    <span class="contact-number">0984 062 140</span>
+                    <span class="icon">📱</span>
+                    <div>
+                        <span class="label">Hotline</span>
+                        <strong class="number">0984 062 140</strong>
+                    </div>
                 </a>
-                <a href="https://zalo.me/0984062140" target="_blank" class="contact-btn">
-                    <span class="contact-icon">💬</span>
-                    <span class="contact-label">Nhắn tin Zalo</span>
-                    <span class="contact-number">0984 062 140</span>
+                <a href="https://zalo.me/0984062140" target="_blank" class="contact-btn" rel="noopener">
+                    <span class="icon">💬</span>
+                    <div>
+                        <span class="label">Zalo</span>
+                        <strong class="number">0984 062 140</strong>
+                    </div>
                 </a>
             </div>
-        </div>
-    </div>
-
-    <div class="overlay" id="overlay" onclick="hidePopup()"></div>
-    <div class="popup" id="popup">
-        <div class="popup-header">
-            <div class="popup-title">
-                <span style="font-size: 22px;">✍️</span> Viết Lời Mời
+            <div class="contact-support">
+                Hỗ trợ 24/7 • Tạo thiệp chỉ trong 10 giây ✨
             </div>
-            <button class="close-btn" onclick="hidePopup()">×</button>
-        </div>
-        
-        <div class="section">
-            <label class="section-label">Tên khách mời</label>
-            <input type="text" id="text" placeholder="Ví dụ: Gia đình Bác Tám Tuyến">
-        </div>
-        
-        <div class="section">
-            <label class="section-label">Kiểu chữ nghệ thuật</label>
-            <select id="font">
-                <option value="'Great Vibes'">Great Vibes (Cổ điển)</option>
-                <option value="'Dancing Script'">Dancing Script (Lãng mạn)</option>
-                <option value="'Caveat'">Caveat (Tự nhiên)</option>
-                <option value="'Be Vietnam Pro'">Be Vietnam Pro (Hiện đại)</option>
-            </select>
-        </div>
-        
-        <div class="section">
-            <label class="section-label">Kích cỡ chữ: <span id="size-value">120</span></label>
-            <div class="size-slider">
-                <input type="range" id="size" min="40" max="250" value="120">
-            </div>
-        </div>
-        
-        <div class="section">
-            <label class="section-label">Màu sắc</label>
-            <div class="palette" id="palette"></div>
-        </div>
-        
-        <div class="action-group">
-            <button class="btn btn-download" onclick="save()">📥 LƯU ẢNH</button>
-            <button class="btn btn-share" onclick="share()">📤 GỬI THIỆP</button>
         </div>
     </div>
 
     <script>
-        const CONFIG = {
-            imageUrl: "https://raw.githubusercontent.com/TuanLamVi/sinhnhat/main/thiepmau7.png",
-            textX: 0.5,           
-            textY: 0.152,         
-            textAlign: "center",  
-            shadowColor: "rgba(0,0,0,0.3)",
-            shadowBlur: 8
-        };
-
+        // Lấy các thẻ HTML
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         const popup = document.getElementById("popup");
-        const overlay = document.getElementById("overlay");
+        const wrapper = document.getElementById("wrapper");
         const textInput = document.getElementById("text");
         const sizeSlider = document.getElementById("size");
         const sizeValue = document.getElementById("size-value");
         const fontSelect = document.getElementById("font");
-        
-        let color = "#5a4a52"; 
+        const palette = document.getElementById("palette");
 
+        // ==================== TỰ ĐỘNG LẤY MẪU THEO LINK ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // Đọc trực tiếp link ảnh và toạ độ từ đường dẫn (URL)
+        const imgFromUrl = urlParams.get('img');
+        const xFromUrl = urlParams.get('x');
+        const yFromUrl = urlParams.get('y');
+
+        let activeConfig = { 
+            imageUrl: imgFromUrl || "https://raw.githubusercontent.com/TuanLamVi/sinhnhat/main/thiepmau7.png", 
+            textPosition: { 
+                x: xFromUrl ? parseFloat(xFromUrl) : 0.5, 
+                y: yFromUrl ? parseFloat(yFromUrl) : 0.152 
+            } 
+        };
+        
         let img = new Image();
         img.crossOrigin = "anonymous";
-        img.src = CONFIG.imageUrl;
+        img.src = activeConfig.imageUrl;
+
         img.onload = () => {
             canvas.width = img.width;
             canvas.height = img.height;
             draw();
         };
+        // =================================================================
 
-        const colors = ["#5a4a52", "#d98cb3", "#d4af37", "#c0392b", "#2c3e50", "#ffffff"];
-        const palette = document.getElementById("palette");
+        // ==================== XỬ LÝ MÀU VÀ VẼ ====================
+        let currentColor = "#000000";
+        const colors = ["#000000", "#e91e63", "#9c27b0", "#3f51b5", "#d81b60", "#ff5722", "#ffffff"];
+        
         colors.forEach(c => {
             let d = document.createElement("div");
             d.className = "color-dot";
             d.style.background = c;
-            d.onclick = () => { color = c; draw(); };
+            d.onclick = () => { currentColor = c; draw(); };
             palette.appendChild(d);
         });
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(img, 0, 0);
+
             const text = textInput.value.trim();
             if (text) {
                 const fontSize = parseFloat(sizeSlider.value);
-                ctx.fillStyle = color;
+                ctx.fillStyle = currentColor;
                 ctx.font = `${fontSize}px ${fontSelect.value}`;
-                ctx.textAlign = CONFIG.textAlign;
+                ctx.textAlign = "center";
                 ctx.textBaseline = "bottom";
-                ctx.shadowColor = CONFIG.shadowColor;
-                ctx.shadowBlur = CONFIG.shadowBlur;
-                ctx.fillText(text, canvas.width * CONFIG.textX, canvas.height * CONFIG.textY);
+
+                // Sử dụng vị trí lưu trong activeConfig
+                const textX = canvas.width * activeConfig.textPosition.x;
+                const textY = canvas.height * activeConfig.textPosition.y;
+
+                ctx.shadowColor = "rgba(0,0,0,0.45)";
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 3;
+
+                ctx.fillText(text, textX, textY);
+
                 ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
             }
         }
 
-        sizeSlider.oninput = () => { sizeValue.textContent = sizeSlider.value; draw(); };
-        textInput.oninput = draw;
-        fontSelect.onchange = draw;
+        // ==================== SỰ KIỆN GIAO DIỆN ====================
+        sizeSlider.addEventListener("input", () => {
+            sizeValue.textContent = sizeSlider.value;
+            draw();
+        });
+        textInput.addEventListener("input", draw);
+        fontSelect.addEventListener("change", draw);
 
         function showPopup() {
-            popup.classList.add("active");
-            overlay.classList.add("active");
+            popup.style.display = "block";
+            setTimeout(() => popup.classList.add("active"), 10);
             textInput.focus();
         }
 
         function hidePopup() {
             popup.classList.remove("active");
-            overlay.classList.remove("active");
+            setTimeout(() => { popup.style.display = "none"; }, 300);
         }
 
-        /* TẠO TÊN FILE TỰ ĐỘNG CHUẨN SEO/FILE SYSTEM */
-        function generateFileName() {
-            let text = textInput.value.trim();
-            if (!text) return "thiep_online.png";
-            
-            text = text.toLowerCase();
-            text = text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            text = text.replace(/đ/g, "d");
-            text = text.replace(/[^a-z0-9]/g, "_");
-            text = text.replace(/_+/g, "_");
-            text = text.replace(/^_|_$/g, "");
-            
-            return text + ".png";
+        wrapper.addEventListener("click", (e) => {
+            if (e.target === wrapper || e.target === canvas) {
+                hidePopup();
+            }
+        });
+
+        // ==================== TẢI XUỐNG & CHIA SẺ ====================
+        // Đặt tên file tự động theo tên khách
+        function getFileName() {
+            const guestName = textInput.value.trim();
+            if (guestName) {
+                // Xoá dấu tiếng việt và dấu cách để làm tên file chuẩn
+                const cleanName = guestName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "_");
+                return `thiep_moi_${cleanName}.png`;
+            }
+            return "thiep_moi.png";
         }
 
-        /* LƯU VÀ GỬI ẢNH */
         function save() {
-            const fileName = generateFileName();
             const a = document.createElement("a");
             a.href = canvas.toDataURL("image/png");
-            a.download = fileName; 
+            a.download = getFileName();
             a.click();
         }
 
         async function share() {
-            if (!navigator.share) return alert("Trình duyệt không hỗ trợ chia sẻ trực tiếp. Vui lòng bấm LƯU ẢNH.");
+            if (!navigator.share) {
+                return alert("Có lỗi trong tính năng chia sẻ, vui lòng bấm vào nút 3 chấm trên cùng bên phải và chọn 'Mở bàng trình duyệt' để tiếp tục");
+            }
             try {
-                const fileName = generateFileName();
                 const blob = await (await fetch(canvas.toDataURL("image/png"))).blob();
-                const file = new File([blob], fileName, { type: "image/png" });
-                await navigator.share({ files: [file], title: "Thiệp Mời", text: "Trân trọng kính mời!" });
+                const file = new File([blob], getFileName(), { type: "image/png" });
+                await navigator.share({ files: [file] });
             } catch (e) {}
         }
     </script>

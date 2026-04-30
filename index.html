@@ -15,7 +15,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script&family=Caveat&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   
     <style>
-        /* GIỮ NGUYÊN CSS GỐC CỦA BẠN */
         :root { --pink1: #ff9a9e; --pink3: #fbc2eb; }
         body { font-family: 'Be Vietnam Pro', sans-serif; margin: 0; background: linear-gradient(135deg, var(--pink1), var(--pink3)); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { width: 100%; max-width: 420px; background: white; border-radius: 22px; padding: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
@@ -128,7 +127,6 @@
     </div>
 
     <script>
-        // Lấy các thẻ HTML
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
         const popup = document.getElementById("popup");
@@ -139,21 +137,26 @@
         const fontSelect = document.getElementById("font");
         const palette = document.getElementById("palette");
 
-        // ==================== TỰ ĐỘNG LẤY MẪU THEO LINK ====================
+        // ==================== ĐỌC DỮ LIỆU TỪ LINK ====================
         const urlParams = new URLSearchParams(window.location.search);
         
-        // Đọc trực tiếp link ảnh và toạ độ từ đường dẫn (URL)
         const imgFromUrl = urlParams.get('img');
         const xFromUrl = urlParams.get('x');
         const yFromUrl = urlParams.get('y');
+        const sizeFromUrl = urlParams.get('size'); // Lấy kích thước chữ từ link
 
         let activeConfig = { 
             imageUrl: imgFromUrl || "https://raw.githubusercontent.com/TuanLamVi/sinhnhat/main/thiepmau7.png", 
             textPosition: { 
                 x: xFromUrl ? parseFloat(xFromUrl) : 0.5, 
                 y: yFromUrl ? parseFloat(yFromUrl) : 0.152 
-            } 
+            },
+            defaultFontSize: sizeFromUrl ? parseInt(sizeFromUrl) : 120
         };
+
+        // Gán cỡ chữ mặc định cho thanh trượt
+        sizeSlider.value = activeConfig.defaultFontSize;
+        sizeValue.textContent = activeConfig.defaultFontSize;
         
         let img = new Image();
         img.crossOrigin = "anonymous";
@@ -164,7 +167,6 @@
             canvas.height = img.height;
             draw();
         };
-        // =================================================================
 
         // ==================== XỬ LÝ MÀU VÀ VẼ ====================
         let currentColor = "#000000";
@@ -190,7 +192,6 @@
                 ctx.textAlign = "center";
                 ctx.textBaseline = "bottom";
 
-                // Sử dụng vị trí lưu trong activeConfig
                 const textX = canvas.width * activeConfig.textPosition.x;
                 const textY = canvas.height * activeConfig.textPosition.y;
 
@@ -233,11 +234,9 @@
         });
 
         // ==================== TẢI XUỐNG & CHIA SẺ ====================
-        // Đặt tên file tự động theo tên khách
         function getFileName() {
             const guestName = textInput.value.trim();
             if (guestName) {
-                // Xoá dấu tiếng việt và dấu cách để làm tên file chuẩn
                 const cleanName = guestName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "_");
                 return `thiep_moi_${cleanName}.png`;
             }

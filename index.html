@@ -139,6 +139,7 @@
     </div>
 
     <script>
+        // LINK API BẠN ĐÃ CUNG CẤP
         const API_URL = "https://script.google.com/macros/s/AKfycbxWK9rCRVGoGSehVxMIxy_68_OwacwKiQyn8qgDcXgd_xB45jdwZJQAGM3zBwFLFFASjg/exec";
 
         const canvas = document.getElementById("canvas");
@@ -166,30 +167,38 @@
         const templateId = urlParams.get('id');
 
         if (templateId) {
-            fetch(API_URL + "?action=read&id=" + templateId)
+            fetch(API_URL + "?action=read&id=" + templateId, { redirect: "follow" })
                 .then(res => res.json())
                 .then(data => {
-                    if (!data.error) {
-                        // KIỂM TRA HẾT HẠN NGAY TẠI ĐÂY
-                        if (data.endDate) {
-                            let end = new Date(data.endDate);
-                            end.setHours(23, 59, 59); // Hết ngày đó
-                            if (new Date() > end) {
-                                document.body.innerHTML = "<div style='color:white; text-align:center; padding: 40px; font-family: sans-serif;'><h2 style='font-size: 24px; margin-bottom: 10px;'>⚠️ Xin lỗi, thiệp mời đã hết hạn!</h2><p>Sự kiện này đã kết thúc. Vui lòng liên hệ người gửi nếu có sai sót.</p></div>";
-                                return; // Dừng việc vẽ thiệp
-                            }
-                        }
-
-                        // Nếu còn hạn thì nạp dữ liệu bình thường
-                        activeConfig = {
-                            imageUrl: data.imageUrl,
-                            textPosition: { x: parseFloat(data.x), y: parseFloat(data.y) },
-                            defaultFontSize: parseInt(data.fontSize) || 80
-                        };
+                    // Nếu Google Sheet báo không tìm thấy mã ID này
+                    if (data.error) {
+                        alert("Không tìm thấy dữ liệu mẫu thiệp này! Sẽ sử dụng mẫu mặc định.");
+                        initCanvas();
+                        return;
                     }
+
+                    // Kiểm tra tính năng hết hạn
+                    if (data.endDate) {
+                        let end = new Date(data.endDate);
+                        end.setHours(23, 59, 59); // Tính đến hết ngày đó
+                        if (new Date() > end) {
+                            // Chặn hiển thị thiệp và báo lỗi
+                            document.body.innerHTML = "<div style='color:white; text-align:center; padding: 40px; font-family: sans-serif;'><h2 style='font-size: 24px; margin-bottom: 10px;'>⚠️ Xin lỗi, thiệp mời đã hết hạn!</h2><p>Sự kiện này đã kết thúc. Vui lòng liên hệ người gửi nếu có sai sót.</p></div>";
+                            return; 
+                        }
+                    }
+
+                    // Nếu còn hạn thì nạp dữ liệu từ Google Sheet
+                    activeConfig = {
+                        imageUrl: data.imageUrl,
+                        textPosition: { x: parseFloat(data.x), y: parseFloat(data.y) },
+                        defaultFontSize: parseInt(data.fontSize) || 80
+                    };
+                    
                     initCanvas();
                 })
                 .catch(err => {
+                    console.error("Lỗi khi kết nối Google Sheet:", err);
                     initCanvas(); // Lỗi mạng thì load mặc định
                 });
         } else {
@@ -198,7 +207,7 @@
 
         // ==================== KHỞI TẠO BẢN VẼ ====================
         function initCanvas() {
-            // Gán cỡ chữ mặc định
+            // Gán cỡ chữ theo cài đặt quản trị
             sizeSlider.value = activeConfig.defaultFontSize;
             sizeValue.textContent = activeConfig.defaultFontSize;
             
@@ -211,7 +220,7 @@
                 document.getElementById('loader').style.display = 'none';
             };
             img.onerror = () => {
-                alert("Ảnh bị lỗi không tải được. Vui lòng kiểm tra lại đường link ảnh!");
+                alert("Ảnh nền bị lỗi hoặc trang lưu ảnh không hỗ trợ tải. Vui lòng kiểm tra lại đường link ảnh trong trang quản trị!");
                 document.getElementById('loader').style.display = 'none';
             }
         }

@@ -95,7 +95,7 @@
             </div>
 
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn-primary" onclick="saveTemplate()" style="flex: 1; padding: 12px;">💾 LƯU LÊN GOOGLE SHEET</button>
+                <button class="btn-primary" onclick="saveTemplate()" style="flex: 1; padding: 12px;">💾 LƯU THIỆP MỜI</button>
                 <button onclick="closeForm()" style="padding: 12px; background: #ccc; color: black;">Huỷ bỏ</button>
             </div>
         </div>
@@ -268,7 +268,7 @@
                     method: 'POST',
                     body: formData
                 });
-                alert('Đã lưu thành công lên Google Sheet!');
+                alert('Đã lưu thành công!');
                 closeForm();
                 fetchTemplates(); 
             } catch (error) {
